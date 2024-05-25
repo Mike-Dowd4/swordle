@@ -7,6 +7,24 @@
   pointer-events: none;
 }
 
+body {
+  background: rgb(2,0,36);
+  background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(1,67,195,1) 0%, rgba(0,151,213,1) 100%);
+}
+
+.header h1{
+  text-align: center
+}
+
+.guess-box {
+  padding-top: 100px;
+  text-align: center;
+}
+
+.guess-form input {
+  
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
