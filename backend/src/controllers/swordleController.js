@@ -6,9 +6,10 @@ const Swimmer = require('../models/Swimmer.js');
 // Gets all of the swimmers in DB(for search bar)
 module.exports.getSwimmers = async (req, res) => {
     try {
-        console.log('Swimmer = ', Swimmer);
         const swimmers = await Swimmer.find();
-        console.log(swimmers);
+        return res.json({status: true,
+            swimmers: JSON.stringify(swimmers)
+        });
     }
     catch(e) {
         console.log('failed: ', e);
