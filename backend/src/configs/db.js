@@ -11,7 +11,9 @@ mongoose.set("strictQuery", true, "useNewUrlParser", true);
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(db);
+    await mongoose.connect(db, {
+      dbName: "swimmer_data"
+    });
     console.log("MongoDB is Connected...");
   } catch (err) {
     console.error(err.message);

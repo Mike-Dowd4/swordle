@@ -1,2 +1,3 @@
 #environment variables
 /.env
+/backend/node_modules

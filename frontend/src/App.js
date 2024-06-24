@@ -13,6 +13,7 @@ function App() {
 
           <form class="guess-form">
             <input type="text" id="guess" name="guess" placeholder="Guess a swimmer"></input>
+            <input type="submit" value="Guess"></input>
           </form>
         </div>
       </div>
