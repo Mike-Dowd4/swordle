@@ -8,14 +8,12 @@ module.exports.getSwimmers = async (req, res) => {
     try {
         const swimmers = await Swimmer.find();
         return res.json({status: true,
-            swimmers: JSON.stringify(swimmers)
+            swimmers: swimmers
         });
     }
     catch(e) {
         console.log('failed: ', e);
         return null;
     }
-    
-
     
 }
