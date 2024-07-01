@@ -8,6 +8,7 @@ function App() {
   const [correctSwimmer, setCorrectSwimmer] = useState(null);
   const [guessList, setGuessList] = useState([]);
   const [guessFeedbackList, setGuessFeedback] = useState([]);
+  const [guessDisabled, setDisabled] = useState(false);
 
   // Ref for the input element
   const inputRef = useRef(null);
@@ -33,7 +34,7 @@ function App() {
 
       //Check if user has played yet today, if not, set numGuesses
       if(localStorage.getItem("numGuesses") == null) {
-        localStorage.setItem("numGuesses", "0");
+        localStorage.setItem("numGuesses", "1");
       }
 
       if(parseInt(localStorage.getItem("numGuesses")) >= 5) {
@@ -49,13 +50,15 @@ function App() {
   //Function that's called when the user has used up all of their guesses
   function doneForDay() {
     alert("TODO: done for day(out of guesses)");
+    setDisabled(true);
   }
 
   //For testing
   function restart_game() {
-    localStorage.setItem("numGuesses", "0");
+    localStorage.setItem("numGuesses", "1");
     setGuessList([]);
     setGuessFeedback([]);
+    setDisabled(false);
   }
 
 
@@ -73,6 +76,12 @@ function App() {
       return;
     }
 
+    const numGuesses = parseInt(localStorage.getItem("numGuesses"));
+
+    if(numGuesses >= 5) { //Game over
+      doneForDay();
+    }
+
     const guessFeedback = getGuessFeedback(swimmer, correctSwimmer);
 
     //TODO: handle guess
@@ -85,13 +94,6 @@ function App() {
       setGuessFeedback([...guessFeedbackList, guessFeedback]);
     }
 
-
-    const numGuesses = parseInt(localStorage.getItem("numGuesses"));
-
-    if(numGuesses >= 5) { //Game over
-      doneForDay();
-    }
-
     //update number of guesses
     localStorage.setItem("numGuesses", `${numGuesses+1}`);
 
@@ -101,6 +103,8 @@ function App() {
 
   }
 
+  //get age of swimmer
+  //param: string of swimmer's bday
   function getAge(birthday_string) {
     let today = new Date();
 
@@ -114,6 +118,40 @@ function App() {
 
     return age;
     
+  }
+
+  //get stroke color
+  //params: string of guessed swimmer's stroke(s), string of correct swimmer's stroke(s)
+  //If strokes are the same: green
+  //If only one stroke correct(if multiple): yellow
+  //If no strokes are the same: red
+  function getStrokeCorrectness(guessStroke, correctStroke) {
+    let strokeFeedback = null;
+    if (guessStroke === correctStroke) {
+      strokeFeedback = "green";
+    }
+
+    let yellow = false;
+    const guessStrokes = guessStroke.split(", ");
+    const correctStrokes = correctStroke.split(", ");
+    
+    for(let i = 0; i < guessStrokes.length; i++) {
+      for (let j = 0; j < correctStrokes.length; j++) {
+        //If any stroke similarity, return yellow
+        if (guessStrokes[i] === correctStrokes[j]) {
+          yellow = true;
+        }
+      }
+    }
+
+    console.log("yellow = ", yellow);
+    if(yellow) {
+      strokeFeedback = "yellow";
+    } else { //if there are no similarities, return red
+      strokeFeedback = "red";
+    }
+
+    return strokeFeedback;
   }
 
   //Gets all the feedback on the guess
@@ -139,11 +177,16 @@ function App() {
       ageColor="yellow_";
     }
 
+    //set stroke correctness
+    stroke = getStrokeCorrectness(guess.Stroke, correct.Stroke);
 
 
+
+    //set up return object
     const feedback = {
       age: age,
-      ageColor: ageColor
+      ageColor: ageColor,
+      stroke: stroke
     }
 
     return feedback;
@@ -160,10 +203,13 @@ function App() {
 
           <form onSubmit={submitGuess} className="guess-form">
           <label>Guess a swimmer:
-          <input ref={inputRef} // Assign ref to input
+          <input 
+                ref={inputRef} // Assign ref to input
                 list="swimmers" 
                 name="swimmers" 
-                onChange={(e) => setSwimmerGuess(e.target.value)} />
+                onChange={(e) => setSwimmerGuess(e.target.value)} 
+                disabled={guessDisabled}
+          />
 
           </label>
           <datalist id="swimmers">
@@ -178,7 +224,10 @@ function App() {
         <ol className="guess-list" id="guess-list">
             {guessList.map((guess, ind) => (
               <li key={ind}>
-                {guess.Name}, age = {guessFeedbackList[ind].age}{(guessFeedbackList[ind].ageColor)}
+                {guess.Name}, 
+                age = {guessFeedbackList[ind].age}
+                {(guessFeedbackList[ind].ageColor)},
+                stroke = {guessFeedbackList[ind].stroke}
               </li>
             ))}
         </ol>
