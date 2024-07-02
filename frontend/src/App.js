@@ -179,13 +179,32 @@ function App() {
 
   }
 
+  //get college correctness
+  //If same college, return green
+  //If same conference, return yellow
+  //If nota, return red
+  //NOTE: ONLY considering most recent college rn
+  function getCollegeCorrectness(guess, correct) {
+    if(guess["US College / University"] === correct["US College / University"]) { //correct college
+      return "green";
+    }
+
+    if(guess["DI Conference"] === correct["DI Conference"]) {
+      return "yellow";
+    }
+
+    return "red";
+
+
+  }
+
   //Gets all the feedback on the guess
   //Whether the age, stroke, college, nationality, etc. is correct or close
   function getGuessFeedback(swimmerGuess, correctSwimmer) {
     const guess = swimmerGuess;
     const correct = correctSwimmer;
 
-    let age, ageColor, stroke, specialty, nationality, gender, college, isl_team = null;
+    let age, ageColor, stroke, specialty, nationality, gender, college = null;
 
     //set age correctness
     const guessAge = getAge(guess.Birthday);
@@ -221,7 +240,7 @@ function App() {
     //If same college, return green
     //If one of the colleges they've been to is the same, return yellow
     //If no similar colleges, return red
-
+    college = getCollegeCorrectness(guess, correct);
 
 
     //set up return object
@@ -231,7 +250,8 @@ function App() {
       stroke: stroke,
       specialty: specialty,
       gender: gender,
-      nationality: nationality
+      nationality: nationality,
+      college: college
     }
 
     return feedback;
@@ -275,7 +295,9 @@ function App() {
                 ({guessFeedbackList[ind].ageColor}),
                 stroke = {guess.Stroke}({guessFeedbackList[ind].stroke}),
                 specialty = {guess.Speciality}({guessFeedbackList[ind].specialty}),
-                nationality = {guess.Nationality}({guessFeedbackList[ind].nationality})
+                nationality = {guess.Nationality}({guessFeedbackList[ind].nationality}),
+                college = {guess["US College / University"]}({guessFeedbackList[ind].college})
+
               </li>
             ))}
         </ol>
