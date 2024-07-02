@@ -129,11 +129,13 @@ function App() {
     let strokeFeedback = null;
     if (guessStroke === correctStroke) {
       strokeFeedback = "green";
+      return strokeFeedback;
     }
 
     let yellow = false;
     const guessStrokes = guessStroke.split(", ");
     const correctStrokes = correctStroke.split(", ");
+
     
     for(let i = 0; i < guessStrokes.length; i++) {
       for (let j = 0; j < correctStrokes.length; j++) {
@@ -154,13 +156,36 @@ function App() {
     return strokeFeedback;
   }
 
+  //get nationality correctness
+  //If same nationality, return green
+  //If same continent, return yellow
+  //If different continents, return red
+  function getNationalityCorrectness(guess, correct) {
+    //If same nationality, return green
+    if(guess.Nationality === correct.Nationality) {
+      return "green";
+    }
+
+    if(guess["Continent 1"] === correct["Continent 1"] ||
+      guess["Continent 2"] === correct["Continent 1"] ||
+      (guess["Continent 2"] === correct["Continent 2"] &&
+        guess["Continent 2"] != null &&
+        correct["Continent 2"] != null)
+    ) {
+      return "yellow";
+    }
+
+    return "red";
+
+  }
+
   //Gets all the feedback on the guess
   //Whether the age, stroke, college, nationality, etc. is correct or close
   function getGuessFeedback(swimmerGuess, correctSwimmer) {
     const guess = swimmerGuess;
     const correct = correctSwimmer;
 
-    let age, ageColor, stroke, college, isl_team, country = null;
+    let age, ageColor, stroke, specialty, nationality, gender, college, isl_team = null;
 
     //set age correctness
     const guessAge = getAge(guess.Birthday);
@@ -180,13 +205,33 @@ function App() {
     //set stroke correctness
     stroke = getStrokeCorrectness(guess.Stroke, correct.Stroke);
 
+    //set specialty correctness(sprint, distance, stroke, etc) 
+    //getStrokeCorrectness also works for specialty
+    specialty = getStrokeCorrectness(guess.Speciality, correct.Speciality)
+
+    gender = getStrokeCorrectness(guess.Gender, correct.Gender);
+
+    //get nationality correctness
+    //If same nationality, return green
+    //If same continent, return yellow
+    //If different continents, return red
+    nationality = getNationalityCorrectness(guess, correct);
+
+    //get college correctness
+    //If same college, return green
+    //If one of the colleges they've been to is the same, return yellow
+    //If no similar colleges, return red
+
 
 
     //set up return object
     const feedback = {
       age: age,
       ageColor: ageColor,
-      stroke: stroke
+      stroke: stroke,
+      specialty: specialty,
+      gender: gender,
+      nationality: nationality
     }
 
     return feedback;
@@ -225,9 +270,12 @@ function App() {
             {guessList.map((guess, ind) => (
               <li key={ind}>
                 {guess.Name}, 
+                gender = {guess.Gender}({guessFeedbackList[ind].gender})
                 age = {guessFeedbackList[ind].age}
-                {(guessFeedbackList[ind].ageColor)},
-                stroke = {guessFeedbackList[ind].stroke}
+                ({guessFeedbackList[ind].ageColor}),
+                stroke = {guess.Stroke}({guessFeedbackList[ind].stroke}),
+                specialty = {guess.Speciality}({guessFeedbackList[ind].specialty}),
+                nationality = {guess.Nationality}({guessFeedbackList[ind].nationality})
               </li>
             ))}
         </ol>
