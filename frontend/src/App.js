@@ -267,29 +267,34 @@ function App() {
         <div className="guess-box">
 
           <form onSubmit={submitGuess} className="guess-form">
-          <label>Guess a swimmer:
-          <input 
-                ref={inputRef} // Assign ref to input
-                list="swimmers" 
-                name="swimmers" 
-                onChange={(e) => setSwimmerGuess(e.target.value)} 
-                disabled={guessDisabled}
-          />
 
-          </label>
-          <datalist id="swimmers">
-            {swimmerData.map((swimmer) => (
-              <option value={swimmer.Name} key={swimmer._id}/>
-            ))}
-          </datalist>
-            <input type="submit" value="Guess"></input>
+
+            <span className="label">Guess a swimmer: </span>
+            
+            <br></br>
+
+            <input 
+                  className="guess-input"
+                  ref={inputRef} // Assign ref to input
+                  list="swimmers" 
+                  name="swimmer" 
+                  onChange={(e) => setSwimmerGuess(e.target.value)} 
+                  disabled={guessDisabled}
+            />
+
+            <datalist className="swimmers-dropdown" id="swimmers">
+              {swimmerData.map((swimmer) => (
+                <option value={swimmer.Name} key={swimmer._id}/>
+              ))}
+            </datalist>
+              <input className="guess-button" type="submit" value="Guess"></input>
           </form>
         </div>
 
-        <ol className="guess-list" id="guess-list">
+        <div className="guess-list" id="guess-list">
             {guessList.map((guess, ind) => (
-              <li key={ind}>
-                {guess.Name}, 
+              <div className="guess-result" key={ind}>
+                Guess #{ind+1}: {guess.Name}, 
                 gender = {guess.Gender}({guessFeedbackList[ind].gender})
                 age = {guessFeedbackList[ind].age}
                 ({guessFeedbackList[ind].ageColor}),
@@ -297,12 +302,12 @@ function App() {
                 specialty = {guess.Speciality}({guessFeedbackList[ind].specialty}),
                 nationality = {guess.Nationality}({guessFeedbackList[ind].nationality}),
                 college = {guess["US College / University"]}({guessFeedbackList[ind].college})
-
-              </li>
+              </div>
             ))}
-        </ol>
-
-        <button style={{marginLeft: '50%'}}onClick={restart_game} >restart</button>
+        </div>
+        <div className="restart-container">
+          <button onClick={restart_game} >restart</button>
+        </div>
       </div>
     </>
   );

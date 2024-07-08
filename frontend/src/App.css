@@ -21,8 +21,28 @@ body {
   text-align: center;
 }
 
-.guess-form input {
-  
+.guess-input {
+  height: 25px;
+  border-radius: 25px;
+  background-color: rgb(81, 169, 172);
+  border: none;
+}
+
+/* Guess submit button */
+.guess-button { 
+  margin-left: 5px;
+  border-radius: 10px;
+  border: none;
+  height: 25px;
+}
+
+/* guess a swimmer label */
+.label {
+  display: block;
+}
+
+.restart-container {
+  text-align: center;
 }
 
 @media (prefers-reduced-motion: no-preference) {
