@@ -9,6 +9,7 @@ function App() {
   const [guessList, setGuessList] = useState([]);
   const [guessFeedbackList, setGuessFeedback] = useState([]);
   const [guessDisabled, setDisabled] = useState(false);
+  const [genderColor, setGenderColor] = useState("rgb(51, 51, 51)")
 
   // Ref for the input element
   const inputRef = useRef(null);
@@ -293,16 +294,24 @@ function App() {
 
         <div className="guess-list" id="guess-list">
             {guessList.map((guess, ind) => (
+              <>
+              <div className="guess-name">Guess #{ind+1}: {guess.Name}</div>
               <div className="guess-result" key={ind}>
-                Guess #{ind+1}: {guess.Name}, 
-                gender = {guess.Gender}({guessFeedbackList[ind].gender})
-                age = {guessFeedbackList[ind].age}
-                ({guessFeedbackList[ind].ageColor}),
-                stroke = {guess.Stroke}({guessFeedbackList[ind].stroke}),
-                specialty = {guess.Speciality}({guessFeedbackList[ind].specialty}),
-                nationality = {guess.Nationality}({guessFeedbackList[ind].nationality}),
-                college = {guess["US College / University"]}({guessFeedbackList[ind].college})
+                
+                
+                <div style={{backgroundColor: 
+                  guessFeedbackList[ind].gender === 'green' ? 'green': genderColor
+                }}>
+                  {guess.Gender}
+                </div>
+
+                <div>age = {guessFeedbackList[ind].age}({guessFeedbackList[ind].ageColor})</div>
+                <div>stroke = {guess.Stroke}({guessFeedbackList[ind].stroke})</div>
+                <div>specialty = {guess.Speciality}({guessFeedbackList[ind].specialty})</div>
+                <div>nationality = {guess.Nationality}({guessFeedbackList[ind].nationality})</div>
+                <div>college = {guess["US College / University"]}({guessFeedbackList[ind].college})</div>
               </div>
+              </>
             ))}
         </div>
         <div className="restart-container">
