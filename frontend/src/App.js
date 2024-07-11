@@ -9,13 +9,15 @@ function App() {
   const [guessList, setGuessList] = useState([]);
   const [guessFeedbackList, setGuessFeedback] = useState([]);
   const [guessDisabled, setDisabled] = useState(false);
-  const [genderColor, setGenderColor] = useState("rgb(51, 51, 51)")
+  const [gameWin, setGameWin] = useState(false);
+  const [gameLoss, setLoss] = useState(false);
+  const [idx_of_answer, set_idx] = useState(Math.floor(Math.random() * 399))
+
+  const yellowColor = 'rgb(179, 161, 50)'
+  const grayColor = 'rgb(51, 51, 51)';
 
   // Ref for the input element
   const inputRef = useRef(null);
-
-  //index of the correct swimmer
-  const idx_of_answer = 1;
 
   // Gets the swimmer data on page render
   // initializes number of guesses
@@ -29,8 +31,6 @@ function App() {
       const res_data = await response.json()
       setSwimmerData(res_data.swimmers);
       setCorrectSwimmer(res_data.swimmers[idx_of_answer]);
-
-      console.log(res_data.swimmers[idx_of_answer]);
       
 
       //Check if user has played yet today, if not, set numGuesses
@@ -45,13 +45,13 @@ function App() {
 
     getSwimmers();
 
-  }, []);
+  }, [idx_of_answer]); //runs again when idx_of_answer changes, so that the correct answer actually changes when idx does
 
 
   //Function that's called when the user has used up all of their guesses
   function doneForDay() {
-    alert("TODO: done for day(out of guesses)");
     setDisabled(true);
+    setLoss(true);
   }
 
   //For testing
@@ -60,6 +60,9 @@ function App() {
     setGuessList([]);
     setGuessFeedback([]);
     setDisabled(false);
+    setGameWin(false);
+    setLoss(false);
+    set_idx(Math.floor(Math.random() * 399));
   }
 
 
@@ -79,21 +82,25 @@ function App() {
 
     const numGuesses = parseInt(localStorage.getItem("numGuesses"));
 
-    if(numGuesses >= 5) { //Game over
-      doneForDay();
-    }
-
     const guessFeedback = getGuessFeedback(swimmer, correctSwimmer);
 
     //TODO: handle guess
     if(swimmer.Name === correctSwimmer.Name) { //correct guess
-      alert("You Win!");
-      restart_game();
+      setGuessList([...guessList, swimmer]);
+      setGuessFeedback([...guessFeedbackList, guessFeedback]);
+      setGameWin(true);
+      setDisabled(true);
     }
     else {//incorrect guess
       setGuessList([...guessList, swimmer]);
       setGuessFeedback([...guessFeedbackList, guessFeedback]);
+
+      if(numGuesses >= 5) { //Game over if not win yet and guesses over 5
+        doneForDay();
+      }
     }
+
+    
 
     //update number of guesses
     localStorage.setItem("numGuesses", `${numGuesses+1}`);
@@ -114,9 +121,6 @@ function App() {
     const diffInMs = today-birthday;
     const years = diffInMs / (1000*60*60*24*365)
     const age = Math.floor(years);
-    console.log(birthday_string);
-    console.log(today,birthday);
-
     return age;
     
   }
@@ -147,7 +151,6 @@ function App() {
       }
     }
 
-    console.log("yellow = ", yellow);
     if(yellow) {
       strokeFeedback = "yellow";
     } else { //if there are no similarities, return red
@@ -204,13 +207,13 @@ function App() {
   function getGuessFeedback(swimmerGuess, correctSwimmer) {
     const guess = swimmerGuess;
     const correct = correctSwimmer;
+    console.log(correctSwimmer);
 
     let age, ageColor, stroke, specialty, nationality, gender, college = null;
 
     //set age correctness
     const guessAge = getAge(guess.Birthday);
     age=guessAge;
-    console.log("calculated age = ", age);
     const correctAge = getAge(correct.Birthday);
     if (guessAge === correctAge) {
       ageColor = "green";
@@ -281,6 +284,9 @@ function App() {
                   name="swimmer" 
                   onChange={(e) => setSwimmerGuess(e.target.value)} 
                   disabled={guessDisabled}
+                  style = {{backgroundColor:
+                    guessDisabled ? 'gray' : 'rgb(81, 169, 172)'
+                  }}
             />
 
             <datalist className="swimmers-dropdown" id="swimmers">
@@ -300,20 +306,86 @@ function App() {
                 
                 
                 <div style={{backgroundColor: 
-                  guessFeedbackList[ind].gender === 'green' ? 'green': genderColor
+                  guessFeedbackList[ind].gender === 'green' ? 'green': grayColor
                 }}>
+                  <span className='hintCategory'>Gender</span>
                   {guess.Gender}
                 </div>
 
-                <div>age = {guessFeedbackList[ind].age}({guessFeedbackList[ind].ageColor})</div>
-                <div>stroke = {guess.Stroke}({guessFeedbackList[ind].stroke})</div>
-                <div>specialty = {guess.Speciality}({guessFeedbackList[ind].specialty})</div>
-                <div>nationality = {guess.Nationality}({guessFeedbackList[ind].nationality})</div>
-                <div>college = {guess["US College / University"]}({guessFeedbackList[ind].college})</div>
+                <div style = {{backgroundColor: 
+                  guessFeedbackList[ind].ageColor === 'yellow_' ? yellowColor :
+                  guessFeedbackList[ind].ageColor === 'yellow^' ? yellowColor :
+                  guessFeedbackList[ind].ageColor === 'green' ? 'green': 
+                  grayColor}}>
+
+                  {/* Add up and down arrow symbol, using unicode values */}
+                  <span className='hintCategory'>Age</span>
+                  {guessFeedbackList[ind].age}
+                  {guessFeedbackList[ind].ageColor === 'yellow^' ? ' \u2191':
+                  guessFeedbackList[ind].ageColor === 'yellow_' ? ' \u2193' : ''}
+
+                </div>
+
+
+                <div style = {{backgroundColor: 
+                  guessFeedbackList[ind].stroke === 'yellow' ? yellowColor :
+                  guessFeedbackList[ind].stroke === 'green' ? 'green': 
+                  grayColor}}>
+                  
+                  <span className='hintCategory'>Stroke</span>
+                  {guess.Stroke}
+                </div>
+
+
+                <div style = {{backgroundColor: 
+                  guessFeedbackList[ind].specialty === 'yellow' ? yellowColor :
+                  guessFeedbackList[ind].specialty === 'green' ? 'green': 
+                  grayColor}}>
+
+                  <span className='hintCategory'>Specialty</span>
+                  {guess.Speciality}
+                </div>
+
+                <div style = {{backgroundColor: 
+                  guessFeedbackList[ind].nationality === 'yellow' ? yellowColor :
+                  guessFeedbackList[ind].nationality === 'green' ? 'green': 
+                  grayColor}}>
+                    
+                  <span className='hintCategory'>Nationality</span>
+                  {guess.Nationality}
+                </div>
+
+
+                <div style = {{backgroundColor: 
+                  guessFeedbackList[ind].college === 'yellow' ? yellowColor :
+                  guessFeedbackList[ind].college === 'green' ? 'green': 
+                  grayColor}}>
+                    
+                  <span className='hintCategory'>College</span>
+                  {guess["US College / University"] === null ? 'N/A' : 
+                  guess["US College / University"]}</div>
               </div>
               </>
             ))}
         </div>
+
+        
+        {/* Only show when loss */}
+        {gameLoss && (
+          <div className='game-loss'>
+            <span style = {{display: 'block'}}>You ran out of guesses :(</span>
+            <span>The correct swimmer was {correctSwimmer.Name}</span>
+          </div>
+        )}
+
+
+
+        { /* Only show this if gameWin hook is true */ }
+        {gameWin && (
+          <div className='game-win'>
+          <span>Game Over. You win!</span>
+        </div>)}
+
         <div className="restart-container">
           <button onClick={restart_game} >restart</button>
         </div>
