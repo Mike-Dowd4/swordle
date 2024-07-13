@@ -301,7 +301,10 @@ function App() {
         <div className="guess-list" id="guess-list">
             {guessList.map((guess, ind) => (
               <>
-              <div className="guess-name">Guess #{ind+1}: {guess.Name}</div>
+              <div className="guess-name">
+                <img src="/swimmer_images/placeholder.png" alt="swimmer image"></img>
+                Guess #{ind+1}: {guess.Name}
+              </div>
               <div className="guess-result" key={ind}>
                 
                 

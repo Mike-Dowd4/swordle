@@ -43,6 +43,20 @@ body {
   display: block;
 }
 
+.guess-name {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap:15px;
+  margin-bottom: 1%;
+  margin-top: 1.5%;
+
+}
+
+.guess-name > img {
+  width:100px;
+}
+
 .guess-list {
   display: flex;
   flex-direction: column;

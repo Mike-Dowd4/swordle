@@ -7,9 +7,7 @@ const connectDB = require('./configs/db');
 const app = express();
 
 // Allow cross origin requests from frontend
-app.use(cors({
-    origin: "http://localhost:3000"
-}));
+app.use(cors());
 
 
 app.use("/api/swordle", swordleRoutes);
