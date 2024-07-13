@@ -207,7 +207,7 @@ function App() {
   function getGuessFeedback(swimmerGuess, correctSwimmer) {
     const guess = swimmerGuess;
     const correct = correctSwimmer;
-    console.log(correctSwimmer);
+    //console.log(correctSwimmer);
 
     let age, ageColor, stroke, specialty, nationality, gender, college = null;
 
@@ -302,7 +302,7 @@ function App() {
             {guessList.map((guess, ind) => (
               <>
               <div className="guess-name">
-                <img src="/swimmer_images/placeholder.png" alt="swimmer image"></img>
+                <img src="/swimmer_images/aaron_shackell.png" alt="swimmer image"></img>
                 Guess #{ind+1}: {guess.Name}
               </div>
               <div className="guess-result" key={ind}>
