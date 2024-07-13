@@ -24,7 +24,7 @@ function App() {
   // ensures user is not over number of allowed guesses
   useEffect(() => {
     async function getSwimmers() {
-      const response = await fetch("http://localhost:8080/api/swordle/", {
+      const response = await fetch("https://swordle-api.onrender.com/", {
         method: "GET"
       })
 
