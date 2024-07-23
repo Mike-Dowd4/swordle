@@ -11,7 +11,6 @@ function App() {
   const [guessDisabled, setDisabled] = useState(false);
   const [gameWin, setGameWin] = useState(false);
   const [gameLoss, setLoss] = useState(false);
-  const [idx_of_answer, set_idx] = useState(Math.floor(Math.random() * 399))
 
   const yellowColor = 'rgb(179, 161, 50)'
   const grayColor = 'rgb(51, 51, 51)';
@@ -30,12 +29,27 @@ function App() {
 
       const res_data = await response.json()
       setSwimmerData(res_data.swimmers);
-      setCorrectSwimmer(res_data.swimmers[idx_of_answer]);
       
 
       //Check if user has played yet today, if not, set numGuesses
-      if(localStorage.getItem("numGuesses") == null) {
+      if(localStorage.getItem("numGuesses") == null || 
+        localStorage.getItem("guessList") == null || 
+        localStorage.getItem("guessFeedback") == null || 
+        localStorage.getItem("idx_of_answer") == null){
+
         localStorage.setItem("numGuesses", "1");
+        //store the guessList and guessFeedback in localstorage
+        localStorage.setItem("guessList", "[]");
+        localStorage.setItem("guessFeedback", "[]");
+        localStorage.setItem("idx_of_answer", (Math.floor(Math.random()*(res_data.swimmers.length-1))).toString());
+
+        let idx_of_answer = parseInt(localStorage.getItem("idx_of_answer"));
+        setCorrectSwimmer(res_data.swimmers[idx_of_answer]);
+      }else { //user is in middle of game
+       
+
+        setGuessList(JSON.parse(localStorage.getItem("guessList")));
+        setGuessFeedback(JSON.parse(localStorage.getItem("guessFeedback")));
       }
 
       if(parseInt(localStorage.getItem("numGuesses")) >= 5) {
@@ -45,7 +59,7 @@ function App() {
 
     getSwimmers();
 
-  }, [idx_of_answer]); //runs again when idx_of_answer changes, so that the correct answer actually changes when idx does
+  }, []); 
 
 
   //Function that's called when the user has used up all of their guesses
@@ -57,17 +71,46 @@ function App() {
   //For testing
   function restart_game() {
     localStorage.setItem("numGuesses", "1");
+    localStorage.setItem("guessList", "[]");
+    localStorage.setItem("guessFeedback", "[]");
     setGuessList([]);
     setGuessFeedback([]);
     setDisabled(false);
     setGameWin(false);
     setLoss(false);
-    set_idx(Math.floor(Math.random() * 399));
+
+
+    localStorage.setItem("idx_of_answer", (Math.floor(Math.random()*(swimmerData.length-1))).toString());
+    let idx_of_answer = parseInt(localStorage.getItem("idx_of_answer"));
+    setCorrectSwimmer(swimmerData[idx_of_answer]);
+  }
+
+
+  //restart game if user deletes any local storage
+  function checkLocalStorage() {
+
+    if(localStorage.getItem("numGuesses") == null || 
+        localStorage.getItem("guessList") == null || 
+        localStorage.getItem("guessFeedback") == null || 
+        localStorage.getItem("idx_of_answer") == null){
+
+      
+      //Clears the input box after a guess
+      setSwimmerGuess("");
+      inputRef.current.value="";
+
+      restart_game();
+      return true;
+    }
   }
 
 
   function submitGuess(e) {
     e.preventDefault();
+
+    if (checkLocalStorage() == true) {
+      return;
+    } 
 
     //The info of the swimmer that was guessed
     const swimmer = swimmerData.find(swimmer => swimmer.Name === swimmerGuess);
@@ -86,14 +129,22 @@ function App() {
 
     //TODO: handle guess
     if(swimmer.Name === correctSwimmer.Name) { //correct guess
+      localStorage.setItem("guessList", JSON.stringify([...guessList, swimmer]));
+      localStorage.setItem("guessFeedback", JSON.stringify([...guessFeedbackList, guessFeedback]));
+
       setGuessList([...guessList, swimmer]);
       setGuessFeedback([...guessFeedbackList, guessFeedback]);
+      
       setGameWin(true);
       setDisabled(true);
     }
     else {//incorrect guess
+      localStorage.setItem("guessList", JSON.stringify([...guessList, swimmer]));
+      localStorage.setItem("guessFeedback", JSON.stringify([...guessFeedbackList, guessFeedback]));
+
       setGuessList([...guessList, swimmer]);
       setGuessFeedback([...guessFeedbackList, guessFeedback]);
+      
 
       if(numGuesses >= 5) { //Game over if not win yet and guesses over 5
         doneForDay();
