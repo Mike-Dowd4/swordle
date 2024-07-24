@@ -11,6 +11,7 @@ function App() {
   const [guessDisabled, setDisabled] = useState(false);
   const [gameWin, setGameWin] = useState(false);
   const [gameLoss, setLoss] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const yellowColor = 'rgb(179, 161, 50)'
   const grayColor = 'rgb(51, 51, 51)';
@@ -37,6 +38,7 @@ function App() {
         localStorage.getItem("guessFeedback") == null || 
         localStorage.getItem("idx_of_answer") == null){
 
+
         localStorage.setItem("numGuesses", "1");
         //store the guessList and guessFeedback in localstorage
         localStorage.setItem("guessList", "[]");
@@ -50,11 +52,16 @@ function App() {
 
         setGuessList(JSON.parse(localStorage.getItem("guessList")));
         setGuessFeedback(JSON.parse(localStorage.getItem("guessFeedback")));
+
+        let idx_of_answer = parseInt(localStorage.getItem("idx_of_answer"));
+        setCorrectSwimmer(res_data.swimmers[idx_of_answer]);
       }
 
       if(parseInt(localStorage.getItem("numGuesses")) >= 5) {
         doneForDay();
       }
+
+      setLoading(false);
     }
 
     getSwimmers();
@@ -129,21 +136,21 @@ function App() {
 
     //TODO: handle guess
     if(swimmer.Name === correctSwimmer.Name) { //correct guess
-      localStorage.setItem("guessList", JSON.stringify([...guessList, swimmer]));
-      localStorage.setItem("guessFeedback", JSON.stringify([...guessFeedbackList, guessFeedback]));
+      localStorage.setItem("guessList", JSON.stringify([swimmer, ...guessList ]));
+      localStorage.setItem("guessFeedback", JSON.stringify([guessFeedback, ...guessFeedbackList]));
 
-      setGuessList([...guessList, swimmer]);
-      setGuessFeedback([...guessFeedbackList, guessFeedback]);
+      setGuessList([swimmer, ...guessList]);
+      setGuessFeedback([guessFeedback, ...guessFeedbackList]);
       
       setGameWin(true);
       setDisabled(true);
     }
     else {//incorrect guess
-      localStorage.setItem("guessList", JSON.stringify([...guessList, swimmer]));
-      localStorage.setItem("guessFeedback", JSON.stringify([...guessFeedbackList, guessFeedback]));
+      localStorage.setItem("guessList", JSON.stringify([swimmer, ...guessList]));
+      localStorage.setItem("guessFeedback", JSON.stringify([guessFeedback, ...guessFeedbackList, ]));
 
-      setGuessList([...guessList, swimmer]);
-      setGuessFeedback([...guessFeedbackList, guessFeedback]);
+      setGuessList([swimmer, ...guessList]);
+      setGuessFeedback([guessFeedback, ...guessFeedbackList]);
       
 
       if(numGuesses >= 5) { //Game over if not win yet and guesses over 5
@@ -312,6 +319,41 @@ function App() {
     return feedback;
   }
 
+  function EndGameComponent() {
+    return (
+      <div style={{paddingTop: '40px'}}>
+        {/* Only show when loss */}
+        {gameLoss && (
+          <div className='game-loss'>
+            <span style = {{display: 'block'}}>You ran out of guesses :(</span>
+            <span>The correct swimmer was {correctSwimmer.Name}</span>
+          </div>
+        )}
+
+
+
+        { /* Only show this if gameWin hook is true */ }
+        {gameWin && (
+          <div className='game-win'>
+          <span>Game Over. You win!</span>
+        </div>)}
+
+        <div className="restart-container">
+          <button onClick={restart_game} >restart</button>
+        </div>
+    </div>
+    )
+  }
+
+
+  if(loading) {
+    return (
+      <div>
+        <h1>LOADING...</h1>
+      </div>
+    )
+  }
+
   return (
     <>
       <div className="header">
@@ -349,12 +391,15 @@ function App() {
           </form>
         </div>
 
+        <EndGameComponent/>
+
         <div className="guess-list" id="guess-list">
             {guessList.map((guess, ind) => (
               <>
               <div className="guess-name">
                 <img src="/swimmer_images/aaron_shackell.png" alt="swimmer image"></img>
-                Guess #{ind+1}: {guess.Name}
+                {/* print out guess number and guess name */}
+                Guess #{parseInt(localStorage.getItem("numGuesses")) - (ind+1)}: {guess.Name}
               </div>
               <div className="guess-result" key={ind}>
                 
@@ -423,26 +468,6 @@ function App() {
             ))}
         </div>
 
-        
-        {/* Only show when loss */}
-        {gameLoss && (
-          <div className='game-loss'>
-            <span style = {{display: 'block'}}>You ran out of guesses :(</span>
-            <span>The correct swimmer was {correctSwimmer.Name}</span>
-          </div>
-        )}
-
-
-
-        { /* Only show this if gameWin hook is true */ }
-        {gameWin && (
-          <div className='game-win'>
-          <span>Game Over. You win!</span>
-        </div>)}
-
-        <div className="restart-container">
-          <button onClick={restart_game} >restart</button>
-        </div>
       </div>
     </>
   );

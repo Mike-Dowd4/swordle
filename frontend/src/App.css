@@ -73,7 +73,21 @@ body {
   background-color: hsl(231, 82%, 45%);
   border-radius: 20px;
   padding: 20px;
-  width: 700px;
+  width: 70%;
+}
+
+@media (min-width: 800px) {
+  .guess-result {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  
+    background-color: hsl(231, 82%, 45%);
+    border-radius: 20px;
+    padding: 20px;
+    width: 700px;
+  }
 }
 
  .hintCategory {
@@ -85,6 +99,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  text-align: center;
   gap: 5px;
   margin: 2px;
   padding: 10px;
