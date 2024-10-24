@@ -113,9 +113,7 @@ function App() {
     const diffInMs = today-birthday;
     const years = diffInMs / (1000*60*60*24*365)
     const age = Math.floor(years);
-    console.log(birthday_string);
-    console.log(today,birthday);
-
+    
     return age;
     
   }
@@ -221,6 +219,7 @@ function App() {
     //If same college, return green
     //If one of the colleges they've been to is the same, return yellow
     //If no similar colleges, return red
+    college = getCollegeCorrectness(guess, correct);
 
 
 
