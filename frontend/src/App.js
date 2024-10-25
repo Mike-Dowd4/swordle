@@ -24,7 +24,7 @@ function App() {
   // ensures user is not over number of allowed guesses
   useEffect(() => {
     async function getSwimmers() {
-      const response = await fetch("https://swordle-api.onrender.com/api/swordle", {
+      const response = await fetch("http://localhost:8080/api/swordle", {
         method: "GET"
       })
 
@@ -265,7 +265,6 @@ function App() {
   function getGuessFeedback(swimmerGuess, correctSwimmer) {
     const guess = swimmerGuess;
     const correct = correctSwimmer;
-    //console.log(correctSwimmer);
 
     let age, ageColor, stroke, specialty, nationality, gender, college = null;
 
@@ -319,7 +318,10 @@ function App() {
     return feedback;
   }
 
+
+  //Component that shows when the game is over
   function EndGameComponent() {
+    
     return (
       <div style={{paddingTop: '40px'}}>
         {/* Only show when loss */}
@@ -327,6 +329,8 @@ function App() {
           <div className='game-loss'>
             <span style = {{display: 'block'}}>You ran out of guesses :(</span>
             <span>The correct swimmer was {correctSwimmer.Name}</span>
+
+            <GuessFeedbackComponent guess={correctSwimmer} ind={-1}/>
           </div>
         )}
 
@@ -345,6 +349,105 @@ function App() {
     )
   }
 
+
+  //Guess box component
+  function GuessFeedbackComponent(props) {
+    const guess = props.guess
+    let ind = props.ind
+
+    let guessFeedbackList_ = guessFeedbackList
+
+    if (ind == -1) {
+      const guessFeedback = getGuessFeedback(correctSwimmer, correctSwimmer)
+      guessFeedbackList_.push(guessFeedback)
+      ind = 5
+    }
+    return(
+      <div className="guess-list" id="guess-list">
+      {/* PRINT THIS INSTEAD IF IT IS AT END OF GAME THAT THE USER LOST*/}
+      {ind == 5 &&(
+        <div className="guess-name">
+          <img src="/swimmer_images/aaron_shackell.png" alt="swimmer image"></img>
+          {/* print out guess number and guess name */}
+          Correct Swimmer: {guess.Name}
+      </div>
+      )}
+
+      {/* For normal guess, print this */}
+      {ind != 5 && (
+        <div className="guess-name">
+          <img src="/swimmer_images/aaron_shackell.png" alt="swimmer image"></img>
+          {/* print out guess number and guess name */}
+          Guess #{parseInt(localStorage.getItem("numGuesses")) - (ind+1)}: {guess.Name}
+        </div>
+      )}
+      
+      <div className="guess-result" key={ind}>
+        
+        
+        <div style={{backgroundColor: 
+          guessFeedbackList[ind].gender === 'green' ? 'green': grayColor
+        }}>
+          <span className='hintCategory'>Gender</span>
+          {guess.Gender}
+        </div>
+
+        <div style = {{backgroundColor: 
+          guessFeedbackList_[ind].ageColor === 'yellow_' ? yellowColor :
+          guessFeedbackList_[ind].ageColor === 'yellow^' ? yellowColor :
+          guessFeedbackList_[ind].ageColor === 'green' ? 'green': 
+          grayColor}}>
+
+          {/* Add up and down arrow symbol, using unicode values */}
+          <span className='hintCategory'>Age</span>
+          {guessFeedbackList_[ind].age}
+          {guessFeedbackList_[ind].ageColor === 'yellow^' ? ' \u2191':
+          guessFeedbackList_[ind].ageColor === 'yellow_' ? ' \u2193' : ''}
+
+        </div>
+
+
+        <div style = {{backgroundColor: 
+          guessFeedbackList_[ind].stroke === 'yellow' ? yellowColor :
+          guessFeedbackList_[ind].stroke === 'green' ? 'green': 
+          grayColor}}>
+          
+          <span className='hintCategory'>Stroke</span>
+          {guess.Stroke}
+        </div>
+
+
+        <div style = {{backgroundColor: 
+          guessFeedbackList_[ind].specialty === 'yellow' ? yellowColor :
+          guessFeedbackList_[ind].specialty === 'green' ? 'green': 
+          grayColor}}>
+
+          <span className='hintCategory'>Specialty</span>
+          {guess.Speciality}
+        </div>
+
+        <div style = {{backgroundColor: 
+          guessFeedbackList_[ind].nationality === 'yellow' ? yellowColor :
+          guessFeedbackList_[ind].nationality === 'green' ? 'green': 
+          grayColor}}>
+            
+          <span className='hintCategory'>Nationality</span>
+          {guess.Nationality}
+        </div>
+
+
+        <div style = {{backgroundColor: 
+          guessFeedbackList_[ind].college === 'yellow' ? yellowColor :
+          guessFeedbackList_[ind].college === 'green' ? 'green': 
+          grayColor}}>
+            
+          <span className='hintCategory'>College</span>
+          {guess["US College / University"] === null ? 'N/A' : 
+          guess["US College / University"]}</div>
+      </div> 
+      </div>
+    )
+  }
 
   if(loading) {
     return (
@@ -396,75 +499,9 @@ function App() {
         <div className="guess-list" id="guess-list">
             {guessList.map((guess, ind) => (
               <>
-              <div className="guess-name">
-                <img src="/swimmer_images/aaron_shackell.png" alt="swimmer image"></img>
-                {/* print out guess number and guess name */}
-                Guess #{parseInt(localStorage.getItem("numGuesses")) - (ind+1)}: {guess.Name}
-              </div>
-              <div className="guess-result" key={ind}>
-                
-                
-                <div style={{backgroundColor: 
-                  guessFeedbackList[ind].gender === 'green' ? 'green': grayColor
-                }}>
-                  <span className='hintCategory'>Gender</span>
-                  {guess.Gender}
-                </div>
-
-                <div style = {{backgroundColor: 
-                  guessFeedbackList[ind].ageColor === 'yellow_' ? yellowColor :
-                  guessFeedbackList[ind].ageColor === 'yellow^' ? yellowColor :
-                  guessFeedbackList[ind].ageColor === 'green' ? 'green': 
-                  grayColor}}>
-
-                  {/* Add up and down arrow symbol, using unicode values */}
-                  <span className='hintCategory'>Age</span>
-                  {guessFeedbackList[ind].age}
-                  {guessFeedbackList[ind].ageColor === 'yellow^' ? ' \u2191':
-                  guessFeedbackList[ind].ageColor === 'yellow_' ? ' \u2193' : ''}
-
-                </div>
-
-
-                <div style = {{backgroundColor: 
-                  guessFeedbackList[ind].stroke === 'yellow' ? yellowColor :
-                  guessFeedbackList[ind].stroke === 'green' ? 'green': 
-                  grayColor}}>
-                  
-                  <span className='hintCategory'>Stroke</span>
-                  {guess.Stroke}
-                </div>
-
-
-                <div style = {{backgroundColor: 
-                  guessFeedbackList[ind].specialty === 'yellow' ? yellowColor :
-                  guessFeedbackList[ind].specialty === 'green' ? 'green': 
-                  grayColor}}>
-
-                  <span className='hintCategory'>Specialty</span>
-                  {guess.Speciality}
-                </div>
-
-                <div style = {{backgroundColor: 
-                  guessFeedbackList[ind].nationality === 'yellow' ? yellowColor :
-                  guessFeedbackList[ind].nationality === 'green' ? 'green': 
-                  grayColor}}>
-                    
-                  <span className='hintCategory'>Nationality</span>
-                  {guess.Nationality}
-                </div>
-
-
-                <div style = {{backgroundColor: 
-                  guessFeedbackList[ind].college === 'yellow' ? yellowColor :
-                  guessFeedbackList[ind].college === 'green' ? 'green': 
-                  grayColor}}>
-                    
-                  <span className='hintCategory'>College</span>
-                  {guess["US College / University"] === null ? 'N/A' : 
-                  guess["US College / University"]}</div>
-              </div>
+              <GuessFeedbackComponent guess={guess} ind={ind} />
               </>
+              
             ))}
         </div>
 
