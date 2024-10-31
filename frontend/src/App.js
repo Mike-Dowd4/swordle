@@ -19,6 +19,8 @@ function App() {
   // Ref for the input element
   const inputRef = useRef(null);
 
+  const dropdownRef = useRef()
+
   // Gets the swimmer data on page render
   // initializes number of guesses
   // ensures user is not over number of allowed guesses
@@ -120,7 +122,7 @@ function App() {
     } 
 
     //The info of the swimmer that was guessed
-    const swimmer = swimmerData.find(swimmer => swimmer.Name === swimmerGuess);
+    const swimmer = swimmerData.find(swimmer => swimmer.Name.toLowerCase() === swimmerGuess.toLowerCase());
 
     //Lets user know if their guess is valid
     if(swimmer == undefined) {
@@ -129,6 +131,7 @@ function App() {
       alert("This swimmer is not a possible answer");
       return;
     }
+
 
     const numGuesses = parseInt(localStorage.getItem("numGuesses"));
 
@@ -156,6 +159,15 @@ function App() {
       if(numGuesses >= 5) { //Game over if not win yet and guesses over 5
         doneForDay();
       }
+    }
+
+
+    let dropdown = document.getElementById("dropdown-items");
+
+    let swimmers = dropdown.getElementsByClassName("dropdown-item");
+
+    for(let i = 0; i < swimmers.length; i++) {
+      swimmers[i].style.display = 'flex';
     }
 
     
@@ -370,7 +382,7 @@ function App() {
           <img src="/swimmer_images/aaron_shackell.png" alt="swimmer image"></img>
           {/* print out guess number and guess name */}
           Correct Swimmer: {guess.Name}
-      </div>
+        </div>
       )}
 
       {/* For normal guess, print this */}
@@ -449,6 +461,37 @@ function App() {
     )
   }
 
+  //FUNCTIONS FOR SEARCH FUNCTIONALITY
+  function searchNames(e) {
+    let search = e.target.value.toLowerCase();
+    let dropdown = document.getElementById("dropdown-items");
+
+    let swimmers = dropdown.getElementsByClassName("dropdown-item");
+
+    for(let i = 0; i < swimmers.length; i++) {
+        let swimmerName = swimmers[i].getElementsByClassName("swimmer-name")[0];
+        
+        let name = swimmerName.textContent.toLowerCase();
+
+        if (name.indexOf(search) > -1) {
+            swimmers[i].style.display = "flex";
+        } else {
+            swimmers[i].style.display = "none";
+        }
+
+        
+    }
+}
+//FUNCTION FOR SEARCH FUNCTIONALITY
+function fillInput(name) {
+    console.log("Yo");
+    let input = document.getElementById("text-input");
+    
+    input.value = name;
+    setSwimmerGuess(name);
+}
+
+
   if(loading) {
     return (
       <div>
@@ -466,32 +509,47 @@ function App() {
       <div className="game-container">
         <div className="guess-box">
 
-          <form onSubmit={submitGuess} className="guess-form">
-
-
+          <div className="guess-form">
             <span className="label">Guess a swimmer: </span>
             
             <br></br>
 
-            <input 
-                  className="guess-input"
-                  ref={inputRef} // Assign ref to input
-                  list="swimmers" 
-                  name="swimmer" 
-                  onChange={(e) => setSwimmerGuess(e.target.value)} 
-                  disabled={guessDisabled}
-                  style = {{backgroundColor:
-                    guessDisabled ? 'gray' : 'rgb(81, 169, 172)'
-                  }}
-            />
+            <div id="input-and-guess-btn">
+              <input 
+                    className="guess-input"
+                    id="text-input"
+                    ref={inputRef} // Assign ref to input
+                    list="swimmers" 
+                    name="swimmer" 
+                    onChange={(e) => setSwimmerGuess(e.target.value)} 
+                    onKeyUp={searchNames}
+                    disabled={guessDisabled}
+                    onFocus={() => {dropdownRef.current.style.visibility='visible'}}
+                    onBlur={() => {dropdownRef.current.style.visibility='hidden'}}
+                    style = {{backgroundColor:
+                      guessDisabled ? 'gray' : 'rgb(81, 169, 172)'
+                    }}
+              />
+              <input className="guess-button" type="submit" value="Guess" onClick={submitGuess}></input> 
+            </div>
 
-            <datalist className="swimmers-dropdown" id="swimmers">
+            <div className="dropdown-items" id="dropdown-items" ref={dropdownRef}>
+              {swimmerData.map((swimmer) => (
+                <div className="dropdown-item" onMouseDown={() => {fillInput(swimmer.Name)}}>
+                  <img className="swimmer-img" src="/swimmer_images/aaron_shackell.png"/>
+                  <span className="swimmer-name" key={swimmer._id}>{swimmer.Name}</span>
+                </div>
+              ))}
+            </div>
+
+            
+            {/* <datalist className="swimmers-dropdown" id="swimmers">
               {swimmerData.map((swimmer) => (
                 <option value={swimmer.Name} key={swimmer._id}/>
               ))}
-            </datalist>
-              <input className="guess-button" type="submit" value="Guess"></input>
-          </form>
+            </datalist>*/}
+              
+          </div>
         </div>
 
         <EndGameComponent/>

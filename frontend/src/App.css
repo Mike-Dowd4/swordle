@@ -18,12 +18,99 @@ body {
   text-align: center
 }
 
+.game-container {
+position: relative;
+}
+
+.guess-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+/* -------------------- For Search -------------------- */
+
+/* width */
+.dropdown-items::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+.dropdown-items::-webkit-scrollbar-track {
+background: #f1f1f1; 
+}
+
+/* Handle */
+.dropdown-items::-webkit-scrollbar-thumb {
+background: #888; 
+}
+
+/* Handle on hover */
+.dropdown-items::-webkit-scrollbar-thumb:hover {
+background: #555; 
+}
+
+
+.dropdown-items {
+  position: absolute;
+  margin-top: 10px;
+  height:200px;
+  overflow-x: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  width: 20%;
+  min-width: 250px;
+  visibility: hidden;
+  border-radius: 5px;
+  top: 100%;
+  opacity: 90%;
+}
+
+
+.dropdown-item:hover {
+    background-color: rgb(177, 255, 255)
+}
+
+.dropdown-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+    background-color: rgb(0, 255, 255,0.99);
+    width: 100%;
+    padding:1% 0 1% 0;
+    border: 1px solid black;
+}
+
+.swimmer-name {
+    padding-left: 1%;
+    font-size: 100%;
+    color: black;
+}
+
+.dropdown-item .swimmer-img {
+    width: 22%;
+    padding-right: 5%
+}
+
+#input-and-guess-btn {
+  width: 20%;
+  min-width: 250px;
+}
+
+
+/* -------------------- For Search -------------------- */
+
 .guess-box {
+  position: relative;
+  margin: 0 auto;
   padding-top: 50px;
   text-align: center;
 }
 
 .guess-input {
+  width: 70%;
   height: 25px;
   border-radius: 25px;
   background-color: rgb(81, 169, 172);
@@ -61,7 +148,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 20px
+  margin: 20px;
 }
 
 .guess-result {
