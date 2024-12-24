@@ -31,7 +31,12 @@ function App() {
       })
 
       const res_data = await response.json()
-      setSwimmerData(res_data.swimmers);
+
+      //Sort swimmer data by swimmer name
+      let v = res_data.swimmers;
+      v = v.sort((a,b) => a.Name.localeCompare(b.Name))
+
+      setSwimmerData(v);
       
 
       //Check if user has played yet today, if not, set numGuesses
@@ -128,8 +133,13 @@ function App() {
     if(swimmer == undefined) {
 
       //TODO: add function to deal with this on frontend
-      alert("This swimmer is not a possible answer");
+      // alert("This swimmer is not a possible answer");
+
+      document.getElementById("invalid-guess-text").style.visibility = "visible";
       return;
+    }
+    else {
+      document.getElementById("invalid-guess-text").style.visibility = "hidden";
     }
 
 
@@ -166,11 +176,10 @@ function App() {
 
     let swimmers = dropdown.getElementsByClassName("dropdown-item");
 
+    // reset dropdown list(always do this)
     for(let i = 0; i < swimmers.length; i++) {
       swimmers[i].style.display = 'flex';
     }
-
-    
 
     //update number of guesses
     localStorage.setItem("numGuesses", `${numGuesses+1}`);
@@ -335,12 +344,15 @@ function App() {
   function EndGameComponent() {
     
     return (
-      <div style={{paddingTop: '40px'}}>
+      <div style={{paddingTop: '2%'}}>
         {/* Only show when loss */}
         {gameLoss && (
           <div className='game-loss'>
-            <span style = {{display: 'block'}}>You ran out of guesses :(</span>
-            <span>The correct swimmer was {correctSwimmer.Name}</span>
+            <div className='game-loss-description'>
+              <span style = {{display: 'block'}}>You ran out of guesses :(</span>
+              <span>The correct swimmer was {correctSwimmer.Name}</span>
+            </div>
+            
 
             <GuessFeedbackComponent guess={correctSwimmer} ind={-1}/>
           </div>
@@ -354,9 +366,6 @@ function App() {
           <span>Game Over. You win!</span>
         </div>)}
 
-        <div className="restart-container">
-          <button onClick={restart_game} >restart</button>
-        </div>
     </div>
     )
   }
@@ -381,7 +390,7 @@ function App() {
         <div className="guess-name">
           <img src="/swimmer_images/aaron_shackell.png" alt="swimmer image"></img>
           {/* print out guess number and guess name */}
-          Correct Swimmer: {guess.Name}
+          <span className="guess-name-text">{guess.Name}</span>
         </div>
       )}
 
@@ -390,31 +399,36 @@ function App() {
         <div className="guess-name">
           <img src="/swimmer_images/aaron_shackell.png" alt="swimmer image"></img>
           {/* print out guess number and guess name */}
-          Guess #{parseInt(localStorage.getItem("numGuesses")) - (ind+1)}: {guess.Name}
+          <span className="guess-name-text">{guess.Name}</span>
         </div>
       )}
+
       
       <div className="guess-result" key={ind}>
         
         
         <div style={{backgroundColor: 
-          guessFeedbackList[ind].gender === 'green' ? 'green': grayColor
+          guessFeedbackList[ind].gender === 'green' ? 'green': grayColor,
+          width: '30px'
         }}>
           <span className='hintCategory'>Gender</span>
-          {guess.Gender}
+          <span className="hint-answer-text">{guess.Gender}</span>
         </div>
 
         <div style = {{backgroundColor: 
           guessFeedbackList_[ind].ageColor === 'yellow_' ? yellowColor :
           guessFeedbackList_[ind].ageColor === 'yellow^' ? yellowColor :
           guessFeedbackList_[ind].ageColor === 'green' ? 'green': 
-          grayColor}}>
+          grayColor,
+          width: '30px'}}>
 
           {/* Add up and down arrow symbol, using unicode values */}
           <span className='hintCategory'>Age</span>
+          <span className="hint-answer-text">
           {guessFeedbackList_[ind].age}
           {guessFeedbackList_[ind].ageColor === 'yellow^' ? ' \u2191':
           guessFeedbackList_[ind].ageColor === 'yellow_' ? ' \u2193' : ''}
+          </span>
 
         </div>
 
@@ -422,40 +436,50 @@ function App() {
         <div style = {{backgroundColor: 
           guessFeedbackList_[ind].stroke === 'yellow' ? yellowColor :
           guessFeedbackList_[ind].stroke === 'green' ? 'green': 
-          grayColor}}>
+          grayColor,
+          width: '100px'}}>
           
           <span className='hintCategory'>Stroke</span>
-          {guess.Stroke}
+          <span className="hint-answer-text">{guess.Stroke}</span>
         </div>
 
 
         <div style = {{backgroundColor: 
           guessFeedbackList_[ind].specialty === 'yellow' ? yellowColor :
           guessFeedbackList_[ind].specialty === 'green' ? 'green': 
-          grayColor}}>
+          grayColor,
+          width: '100px'}}>
 
           <span className='hintCategory'>Specialty</span>
-          {guess.Speciality}
+          <span className="hint-answer-text">{guess.Speciality}</span>
         </div>
 
         <div style = {{backgroundColor: 
           guessFeedbackList_[ind].nationality === 'yellow' ? yellowColor :
           guessFeedbackList_[ind].nationality === 'green' ? 'green': 
-          grayColor}}>
+          grayColor,
+          width: '40px'}}>
             
           <span className='hintCategory'>Nationality</span>
-          {guess.Nationality}
+          <span className="hint-answer-text">{guess.Nationality}</span>
         </div>
 
 
         <div style = {{backgroundColor: 
           guessFeedbackList_[ind].college === 'yellow' ? yellowColor :
           guessFeedbackList_[ind].college === 'green' ? 'green': 
-          grayColor}}>
+          grayColor,
+          width: '150px'}}>
             
           <span className='hintCategory'>College</span>
+          
+          <span className="hint-answer-text">
           {guess["US College / University"] === null ? 'N/A' : 
-          guess["US College / University"]}</div>
+          guess["US College / University"]}
+          </span>
+          
+        
+        </div>
       </div> 
       </div>
     )
@@ -515,8 +539,16 @@ function fillInput(name) {
             <br></br>
 
             <div id="input-and-guess-btn">
+              {/* numGuess is at 6(after game ends) keep display at 5 */}
+              { 
+              parseInt(localStorage.getItem("numGuesses")) >= 5 ? 
+              <span className="guess-counter">Guess #5 of 5</span> :
+              <span className="guess-counter"> Guess #{parseInt(localStorage.getItem("numGuesses"))} of 5</span>
+              }   
+              <br></br>
               <input 
                     className="guess-input"
+                    autoComplete='off'
                     id="text-input"
                     ref={inputRef} // Assign ref to input
                     list="swimmers" 
@@ -527,11 +559,15 @@ function fillInput(name) {
                     onFocus={() => {dropdownRef.current.style.visibility='visible'}}
                     onBlur={() => {dropdownRef.current.style.visibility='hidden'}}
                     style = {{backgroundColor:
-                      guessDisabled ? 'gray' : 'rgb(81, 169, 172)'
+                      guessDisabled ? 'gray' : 'rgb(81, 169, 172)',
+                      paddingLeft:'5%'
                     }}
               />
               <input className="guess-button" type="submit" value="Guess" onClick={submitGuess}></input> 
+
+              <span className="invalid-guess-text" id="invalid-guess-text">The swimmer you entered is invalid</span>
             </div>
+
 
             <div className="dropdown-items" id="dropdown-items" ref={dropdownRef}>
               {swimmerData.map((swimmer) => (
@@ -554,13 +590,17 @@ function fillInput(name) {
 
         <EndGameComponent/>
 
-        <div className="guess-list" id="guess-list">
+        <div className="guess-list-container" id="guess-list-container">
             {guessList.map((guess, ind) => (
               <>
               <GuessFeedbackComponent guess={guess} ind={ind} />
               </>
               
             ))}
+        </div>
+
+        <div className="restart-container">
+          <button onClick={restart_game} >restart</button>
         </div>
 
       </div>

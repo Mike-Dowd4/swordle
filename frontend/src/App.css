@@ -15,11 +15,13 @@ body {
 }
 
 .header h1{
+  margin-top: 2%;
+  margin-bottom: 1%;
   text-align: center
 }
 
 .game-container {
-position: relative;
+  position: relative;
 }
 
 .guess-form {
@@ -31,40 +33,42 @@ position: relative;
 
 /* -------------------- For Search -------------------- */
 
+/* SCROLLBAR STYLING: CURRENTLY NO SCROLLBAR */
 /* width */
 .dropdown-items::-webkit-scrollbar {
-  width: 10px;
+  /* width: 10px; */
+  display: none;
 }
 
 /* Track */
-.dropdown-items::-webkit-scrollbar-track {
+/* .dropdown-items::-webkit-scrollbar-track {
 background: #f1f1f1; 
 }
 
 /* Handle */
-.dropdown-items::-webkit-scrollbar-thumb {
+/* .dropdown-items::-webkit-scrollbar-thumb {
 background: #888; 
-}
+} */
 
 /* Handle on hover */
-.dropdown-items::-webkit-scrollbar-thumb:hover {
+/* .dropdown-items::-webkit-scrollbar-thumb:hover {
 background: #555; 
-}
+}  */
 
 
 .dropdown-items {
   position: absolute;
   margin-top: 10px;
-  height:200px;
+  height:300px;
   overflow-x: auto;
   overflow-x: hidden;
-  scrollbar-width: thin;
+  /* scrollbar-width: thin; */
   width: 20%;
   min-width: 250px;
   visibility: hidden;
-  border-radius: 5px;
-  top: 100%;
-  opacity: 90%;
+  border-radius: 10px;
+  top: 80%;
+  opacity: 80%;
 }
 
 
@@ -80,7 +84,7 @@ background: #555;
     background-color: rgb(0, 255, 255,0.99);
     width: 100%;
     padding:1% 0 1% 0;
-    border: 1px solid black;
+    /* border: 1px solid black; */
 }
 
 .swimmer-name {
@@ -105,7 +109,6 @@ background: #555;
 .guess-box {
   position: relative;
   margin: 0 auto;
-  padding-top: 50px;
   text-align: center;
 }
 
@@ -123,6 +126,7 @@ background: #555;
   border-radius: 10px;
   border: none;
   height: 25px;
+  cursor: pointer;
 }
 
 /* guess a swimmer label */
@@ -130,27 +134,49 @@ background: #555;
   display: block;
 }
 
+
 .guess-name {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap:15px;
+  
   margin-bottom: 1%;
-  margin-top: 1.5%;
+  margin-right: 10%;
+  margin-left: 25%;
+}
 
+.guess-counter {
+  font-size: 10px;
+}
+
+.guess-name-text {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.invalid-guess-text {
+  color:red;
+  font-size: 10px;
+  visibility: hidden;
+  
 }
 
 .guess-name > img {
-  width:100px;
+  width:80px;
 }
+
 
 .guess-list {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin: 20px;
+  /* align-items: center; */
+  margin: 0 auto;
+  width: 80%;
+  margin-bottom: 3%;
 }
 
+/* Guess result when width less than 800px (mobile)*/
 .guess-result {
   display: flex;
   flex-direction: row;
@@ -158,28 +184,22 @@ background: #555;
   justify-content: center;
 
   background-color: hsl(231, 82%, 45%);
+
   border-radius: 20px;
-  padding: 20px;
-  width: 70%;
+  padding: 10px;
 }
 
-@media (min-width: 800px) {
-  .guess-result {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-  
-    background-color: hsl(231, 82%, 45%);
-    border-radius: 20px;
-    padding: 20px;
-    width: 700px;
+/* When width > 800px (desktop) */
+@media (min-width: 600px) {
+  .guess-list {
+    width: 500px;
   }
+
 }
 
- .hintCategory {
-  color: gray;
-  font-size: 12px;
+.hintCategory {
+color: gray;
+font-size: 10px;
 } 
 
 .guess-result > div {
@@ -189,7 +209,7 @@ background: #555;
   text-align: center;
   gap: 5px;
   margin: 2px;
-  padding: 10px;
+  padding: 5px;
   padding-inline: 25px;
   background-color: rgb(51, 51, 51);
   border-radius: 20px;
@@ -200,8 +220,13 @@ background: #555;
 }
 
 .game-loss {
-  text-align: center;
+  /* text-align: center; */
   margin-bottom: 20px;
+}
+
+.game-loss-description {
+  text-align: center;
+  padding-bottom: 2%;
 }
 
 .restart-container {
