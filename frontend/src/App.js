@@ -415,6 +415,7 @@ function App() {
           <span className="hint-answer-text">{guess.Gender}</span>
         </div>
 
+
         <div style = {{backgroundColor: 
           guessFeedbackList_[ind].ageColor === 'yellow_' ? yellowColor :
           guessFeedbackList_[ind].ageColor === 'yellow^' ? yellowColor :
@@ -515,22 +516,40 @@ function fillInput(name) {
     setSwimmerGuess(name);
 }
 
+// Show instructions and disable/dim rest of screen
+function showInstructions() {
+  document.getElementById("instructions-popup-container").style.display="block";
+  document.body.classList.add('no-scroll'); // disable scrolling
+  document.getElementById("overlay").classList.add("active");
+}
 
-  if(loading) {
-    return (
-      <div>
-        <h1>LOADING...</h1>
-      </div>
-    )
-  }
+// Close instructions
+function closeInstructions() {
+  document.getElementById("instructions-popup-container").style.display="none"
+  document.body.classList.remove('no-scroll');
+  document.getElementById("overlay").classList.remove("active");
+}
+
+
+if(loading) {
+  return (
+    <div>
+      <h1>LOADING...</h1>
+    </div>
+  )
+}
 
   return (
     <>
+      <div className="overlay" id="overlay" onClick={closeInstructions}></div>
       <div className="header">
         <h1>SWORDLE</h1>
+        <div className="instructions-icon" onClick={showInstructions}>
+          <i class="fa fa-question-circle"></i>
+        </div>
       </div>
 
-      <div className="game-container">
+      <div className="game-container" id="game-container">
         <div className="guess-box">
 
           <div className="guess-form">
@@ -563,7 +582,11 @@ function fillInput(name) {
                       paddingLeft:'5%'
                     }}
               />
-              <input className="guess-button" type="submit" value="Guess" onClick={submitGuess}></input> 
+              <input className="guess-button" 
+                     type="submit" 
+                     value="Guess" 
+                     disabled={guessDisabled}
+                     onClick={submitGuess}></input> 
 
               <span className="invalid-guess-text" id="invalid-guess-text">The swimmer you entered is invalid</span>
             </div>
@@ -603,6 +626,27 @@ function fillInput(name) {
           <button onClick={restart_game} >restart</button>
         </div>
 
+      </div>
+
+      <div className="instructions-popup-container" id="instructions-popup-container">
+        <div className="instructions-close-button" onClick={closeInstructions}>
+          <span className='closeout'>&times;</span>
+        </div>
+
+        <h3 style={{color: 'black', textAlign: 'center', paddingBottom: '1.5%'}}>SWORDLE TIPS</h3>
+        
+        <ul className="instructions-list">
+          <li>If Stroke is <span style={{color: 'rgb(179, 161, 50)'}}>yellow</span>, one but not all of the strokes are correct</li>
+          <li>If Nationality is <span style={{color: 'rgb(179, 161, 50)'}}>yellow</span>, the Country is on the correct Continent</li>
+          <li>If College is <span style={{color: 'rgb(179, 161, 50)'}}>yellow</span>, the College is in the correct Conference</li>
+          <li>College is the last college the swimmer swam at</li>
+        </ul>
+
+        <p className="note-text">Note: The current swimmer data is ~2 years old, so some colleges may be
+          incorrect if the swimmer transferred recently. Also, some swimmers may just be 
+          irrelevant now, so keep that in mind. 
+        </p>
+        <p className = "shoutout-text">Special shoutout to Tim Cheng for making the data used for Swordle</p>
       </div>
     </>
   );

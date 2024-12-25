@@ -14,11 +14,24 @@ body {
   padding-bottom: 100px;
 }
 
-.header h1{
-  margin-top: 2%;
-  margin-bottom: 1%;
-  text-align: center
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
+
+.header h1 {
+  
+}
+
+.instructions-icon {
+  font-size: 24px; 
+  position: absolute;
+  right: 20px;
+  cursor: pointer;
+}
+
+
 
 .game-container {
   position: relative;
@@ -127,6 +140,12 @@ background: #555;
   border: none;
   height: 25px;
   cursor: pointer;
+  transition: all 0.5s;
+}
+
+.guess-button:hover {
+  background-color: rgb(126, 232, 236);
+
 }
 
 /* guess a swimmer label */
@@ -215,6 +234,7 @@ font-size: 10px;
   border-radius: 20px;
 }
 
+
 .game-win {
   text-align: center;
 }
@@ -227,6 +247,101 @@ font-size: 10px;
 .game-loss-description {
   text-align: center;
   padding-bottom: 2%;
+}
+
+/* ------------------- INSTRUCTIONS STYLING ---------------------------------- */
+
+
+.instructions-popup-container {
+  position: fixed;
+  width: 400px;
+  height: 450px;
+  background-color: rgb(227, 233, 232);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 15px;
+  /* z-index makes it above overlay */
+  z-index: 1000; 
+  display: none;
+}
+
+.instructions-close-button {
+  position: absolute;
+  top: 0%;
+  right: 3%;
+}
+
+.closeout {
+  font-size: 30px;
+  color: rgb(203, 211, 211);
+  cursor: pointer;
+}
+
+.closeout:hover {
+  color: rgb(101, 108, 108);
+}
+
+.instructions-list {
+  color: black;
+  margin-right: 5%;
+}
+
+.instructions-list > li {
+  padding-bottom: 3%;
+}
+
+.note-text {
+  color: black;
+  padding: 0 5%;
+}
+
+.shoutout-text {
+  color: black;
+  padding-top: 12%;
+  font-size: 12px;
+  text-align: center;
+}
+
+@media (max-width: 400px) {
+  .instructions-popup-container {
+    width: 290px;
+  }
+
+  .instructions-list {
+    font-size: 14px;
+  }
+
+  .note-text {
+    font-size: 14px;
+  }
+
+  .shoutout-text {
+    font-size: 10px;
+    padding-top: 14%;
+  }
+
+}
+
+.no-scroll {
+  overflow: hidden;
+}
+
+/* Overlay for dimming the background */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  z-index: 999; /* Make sure it sits on top of everything */
+  display: none; /* Hidden by default */
+}
+
+/* Show the overlay when active */
+.overlay.active {
+  display: block;
 }
 
 .restart-container {
