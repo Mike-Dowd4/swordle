@@ -400,25 +400,14 @@ function App() {
       ind = 5
     }
     return(
-      <div className="guess-list" id="guess-list">
-      {/* PRINT THIS INSTEAD IF IT IS AT END OF GAME THAT THE USER LOST*/}
-      {ind == 5 &&(
-        <div className="guess-name">
-          <img src="/swimmer_images/aaron_shackell.png" alt="swimmer image"></img>
-          {/* print out guess number and guess name */}
-          <span className="guess-name-text">{guess.Name}</span>
-        </div>
-      )}
-
-      {/* For normal guess, print this */}
-      {ind != 5 && (
-        <div className="guess-name">
-          <img src="/swimmer_images/aaron_shackell.png" alt="swimmer image"></img>
-          {/* print out guess number and guess name */}
-          <span className="guess-name-text">{guess.Name}</span>
-        </div>
-      )}
-
+      <div className="guess-list">
+      
+      <div className="guess-name">
+        <img src="/swimmer_images/aaron_shackell.png" alt="swimmer image"></img>
+        {/* print out guess number and guess name */}
+        <span className="guess-name-text">{guess.Name}</span>
+      </div>
+    
       
       <div className="guess-result" key={ind}>
         
@@ -623,12 +612,15 @@ if(loading) {
         <EndGameComponent/>
 
         <div className="guess-list-container" id="guess-list-container">
+          
             {guessList.map((guess, ind) => (
               <>
               <GuessFeedbackComponent guess={guess} ind={ind} />
               </>
               
             ))}
+              
+          
         </div>
 
         <div className="restart-container">
