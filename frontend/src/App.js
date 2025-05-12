@@ -64,8 +64,9 @@ function App() {
         setCorrectSwimmer(res_data.swimmers[idx_of_answer]);
       }
 
+      // If user is currently out of guesses for the day
       if(parseInt(localStorage.getItem("numGuesses")) >= 5) {
-        doneForDay();
+        doneForDay(); //Disables guesses
       }
 
       setLoading(false);
@@ -75,11 +76,24 @@ function App() {
 
   }, []); 
 
+  // Checks if user has won/lost to display correct losing/winning display(on page return)
+  useEffect(() => {
+    if (!guessList[0] || !correctSwimmer) { //If not loaded yet skip
+      return;
+    } 
+    let lastGuess = guessList[0];
+    if(correctSwimmer._id === lastGuess._id) {
+      setGameWin(true);
+    }
+    else {
+      setLoss(true);
+    }
+  }, [correctSwimmer])
+
 
   //Function that's called when the user has used up all of their guesses
   function doneForDay() {
     setDisabled(true);
-    setLoss(true);
   }
 
   //For testing
@@ -121,6 +135,7 @@ function App() {
 
   function submitGuess(e) {
     e.preventDefault();
+    console.log(correctSwimmer);
 
     if (checkLocalStorage() == true) {
       return;
@@ -146,9 +161,9 @@ function App() {
     const numGuesses = parseInt(localStorage.getItem("numGuesses"));
 
     const guessFeedback = getGuessFeedback(swimmer, correctSwimmer);
-
-    //TODO: handle guess
-    if(swimmer.Name === correctSwimmer.Name) { //correct guess
+    
+    // Handle Guess
+    if(swimmer._id === correctSwimmer._id) { //correct guess
       localStorage.setItem("guessList", JSON.stringify([swimmer, ...guessList ]));
       localStorage.setItem("guessFeedback", JSON.stringify([guessFeedback, ...guessFeedbackList]));
 
@@ -168,6 +183,7 @@ function App() {
 
       if(numGuesses >= 5) { //Game over if not win yet and guesses over 5
         doneForDay();
+        setLoss(true);
       }
     }
 
@@ -509,7 +525,6 @@ function App() {
 }
 //FUNCTION FOR SEARCH FUNCTIONALITY
 function fillInput(name) {
-    console.log("Yo");
     let input = document.getElementById("text-input");
     
     input.value = name;
@@ -545,7 +560,7 @@ if(loading) {
       <div className="header">
         <h1>SWORDLE</h1>
         <div className="instructions-icon" onClick={showInstructions}>
-          <i class="fa fa-question-circle"></i>
+          <i className="fa fa-question-circle"></i>
         </div>
       </div>
 
@@ -591,7 +606,7 @@ if(loading) {
               <span className="invalid-guess-text" id="invalid-guess-text">The swimmer you entered is invalid</span>
             </div>
 
-
+            {/* Search Dropdown */}
             <div className="dropdown-items" id="dropdown-items" ref={dropdownRef}>
               {swimmerData.map((swimmer) => (
                 <div className="dropdown-item" onMouseDown={() => {fillInput(swimmer.Name)}}>
@@ -601,12 +616,6 @@ if(loading) {
               ))}
             </div>
 
-            
-            {/* <datalist className="swimmers-dropdown" id="swimmers">
-              {swimmerData.map((swimmer) => (
-                <option value={swimmer.Name} key={swimmer._id}/>
-              ))}
-            </datalist>*/}
               
           </div>
         </div>
