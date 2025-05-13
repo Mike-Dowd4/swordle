@@ -1,5 +1,7 @@
 import logo from './logo.svg';
 import { useState, useEffect, useRef } from 'react';
+import { createRoot } from 'react-dom/client';
+import JSConfetti from "js-confetti";
 import './App.css';
 
 function App() {
@@ -13,6 +15,7 @@ function App() {
   const [gameLoss, setLoss] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  
   const yellowColor = 'rgb(179, 161, 50)'
   const grayColor = 'rgb(51, 51, 51)';
 
@@ -76,18 +79,44 @@ function App() {
 
   }, []); 
 
+  //Clears guesses from board for UI cleanup
+  function clearGuesses() {
+    // Removes all guesses from board
+    const guesses = document.getElementById('guess-list-container');
+    while (guesses.firstChild) {
+        guesses.removeChild(guesses.firstChild);
+    }
+  }
+
   // Checks if user has won/lost to display correct losing/winning display(on page return)
+  // This fires once game has loaded(because correctSwimmer is set)
+  // User can either be midgame, not started game, or done with game
+  // If midgame - must display current board
+  // If endgame - must display current board/endgame screen
   useEffect(() => {
-    if (!guessList[0] || !correctSwimmer) { //If not loaded yet skip
+    let guesses = JSON.parse(localStorage.getItem("guessList"));
+    if (!guesses[0] || !correctSwimmer) { //If not loaded yet or user has not started playing yet skip
       return;
-    } 
-    let lastGuess = guessList[0];
+    }
+
+    let lastGuess = guesses[0];
+
+    if (guesses.length > 0 && guessList.length < 5 && correctSwimmer._id !== lastGuess._id) { //User refreshes/comes back during game
+      displayCurrentBoard();
+      return;
+    }
+
+    //Decide if the user is done with game
     if(correctSwimmer._id === lastGuess._id) {
       setGameWin(true);
+      displayCurrentBoard();
+      doneForDay();
     }
     else {
       setLoss(true);
+      displayCurrentBoard();
     }
+
   }, [correctSwimmer])
 
 
@@ -106,6 +135,8 @@ function App() {
     setDisabled(false);
     setGameWin(false);
     setLoss(false);
+
+    clearGuesses();
 
 
     localStorage.setItem("idx_of_answer", (Math.floor(Math.random()*(swimmerData.length-1))).toString());
@@ -172,6 +203,10 @@ function App() {
       
       setGameWin(true);
       setDisabled(true);
+
+      //confetti for the dub
+      const jsConfetti = new JSConfetti();
+      jsConfetti.addConfetti();
     }
     else {//incorrect guess
       localStorage.setItem("guessList", JSON.stringify([swimmer, ...guessList]));
@@ -180,7 +215,7 @@ function App() {
       setGuessList([swimmer, ...guessList]);
       setGuessFeedback([guessFeedback, ...guessFeedbackList]);
       
-
+      //LOSS CONDITION
       if(numGuesses >= 5) { //Game over if not win yet and guesses over 5
         doneForDay();
         setLoss(true);
@@ -204,7 +239,70 @@ function App() {
     setSwimmerGuess("");
     inputRef.current.value="";
 
+
+    //Update UI
+    let guesses = JSON.parse(localStorage.getItem("guessList"));
+
+    let newGuess = guesses[0];
+    console.log(newGuess);
+
+    const newDiv = document.createElement("div");
+    const root = createRoot(newDiv);
+    
+    root.render(<GuessFeedbackComponent guess={newGuess} ind={0}/>);
+    let container = document.getElementById("guess-list-container");
+    let currentHead = container.firstElementChild;
+    console.log(container.childNodes.length);
+    if (container.childNodes.length == 0) {
+      newDiv.classList.add("guess-list-new");
+      container.appendChild(newDiv);
+
+      setTimeout(() => {
+        newDiv.classList.add("opacity");
+      }, 0);
+      
+      setTimeout(() => {
+        newDiv.classList.remove("guess-list-new", "opacity");
+      }, 1000);
+
+      return;
+    }
+
+    newDiv.classList.add("guess-list-new");
+
+    container.insertBefore(newDiv, currentHead);
+
+    setTimeout(() => {
+      newDiv.classList.add("fade-in");
+    }, 0);
+    setTimeout(() => {
+      newDiv.classList.add("opacity");
+    }, 700);
+
+    setTimeout(() => {
+      newDiv.classList.remove("guess-list-new", "fade-in", "opacity");
+    }, 2000);
   }
+
+  //When user comes back to page, game should display the current board
+  function displayCurrentBoard() {
+    //Clear board in case there are stragglers
+    clearGuesses();
+    console.log("displayCurrentBoard");
+
+    let listParent = document.getElementById("guess-list-container");
+    for(let i=0; i <guessList.length; i++) {
+      console.log("hi,", i);
+      const newGuess = guessList[i];
+      const newDiv = document.createElement("div");
+      const root = createRoot(newDiv);
+      root.render(<GuessFeedbackComponent guess={newGuess} ind={i}/>);
+      
+      listParent.appendChild(newDiv);
+    }
+  }
+
+  
 
   //get age of swimmer
   //param: string of swimmer's bday
@@ -392,8 +490,10 @@ function App() {
     const guess = props.guess
     let ind = props.ind
 
-    let guessFeedbackList_ = guessFeedbackList
+    let guessFeedbackList_ = JSON.parse(localStorage.getItem("guessFeedback"));
 
+    console.log("hey", guessFeedbackList_);
+    //Handles when user loses
     if (ind == -1) {
       const guessFeedback = getGuessFeedback(correctSwimmer, correctSwimmer)
       guessFeedbackList_.push(guessFeedback)
@@ -413,7 +513,7 @@ function App() {
         
         
         <div style={{backgroundColor: 
-          guessFeedbackList[ind].gender === 'green' ? 'green': grayColor,
+          guessFeedbackList_[ind].gender === 'green' ? 'green': grayColor,
           width: '30px'
         }}>
           <span className='hintCategory'>Gender</span>
@@ -612,13 +712,13 @@ if(loading) {
         <EndGameComponent/>
 
         <div className="guess-list-container" id="guess-list-container">
-          
+{/*           
             {guessList.map((guess, ind) => (
               <>
               <GuessFeedbackComponent guess={guess} ind={ind} />
               </>
               
-            ))}
+            ))} */}
               
           
         </div>

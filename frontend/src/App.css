@@ -14,6 +14,10 @@ body {
   padding-bottom: 100px;
 }
 
+body::-webkit-scrollbar {
+  display: none;
+}
+
 .header {
   display: flex;
   justify-content: center;
@@ -64,6 +68,7 @@ background: #888;
 /* .dropdown-items::-webkit-scrollbar-thumb:hover {
 background: #555; 
 }  */
+
 
 
 .dropdown-items {
@@ -184,14 +189,16 @@ background: #555;
 
 /* This is for animating */
 .guess-list-new {
-  display: flex;
-  flex-direction: column;
-  /* align-items: center; */
-  margin: 0 auto;
-  width: 80%;
-  height: 0;
-  transition: all 3s;
-  margin-bottom: 3%;
+  max-height: 0;
+  opacity:0;
+  z-index: -100;
+  transition: max-height 3s, opacity 2s;
+}
+.guess-list-new.fade-in {
+  max-height: 400px;
+}
+.guess-list-new.opacity {
+  opacity: 100%;
 }
 
 
@@ -201,7 +208,7 @@ background: #555;
   /* align-items: center; */
   margin: 0 auto;
   width: 80%;
-  margin-bottom: 3%;
+  padding-bottom: 3%;
 }
 
 /* Guess result when width less than 800px (mobile)*/
