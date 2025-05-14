@@ -162,9 +162,7 @@ background: #555;
   align-items: center;
   gap:15px;
   
-  margin-bottom: 1%;
-  margin-right: 10%;
-  margin-left: 25%;
+  margin: auto;
 }
 
 .guess-counter {
@@ -227,7 +225,7 @@ background: #555;
 /* When width > 600px (desktop) */
 @media (min-width: 600px) {
   .guess-list {
-    width: 500px;
+    width: 600px;
   }
 
 }
@@ -282,6 +280,22 @@ font-size: 10px;
   display: none;
 }
 
+.endgame-popup-container {
+  position: fixed;
+  width: 400px;
+  height: 450px;
+  background-color: rgba(4, 4, 128);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 15px;
+  /* z-index makes it above overlay */
+  z-index: 1000; 
+  display: none;
+  transition: all 2s;
+  opacity: 0;
+}
+
 .instructions-close-button {
   position: absolute;
   top: 0%;
@@ -321,6 +335,10 @@ font-size: 10px;
 
 @media (max-width: 400px) {
   .instructions-popup-container {
+    width: 290px;
+  }
+
+  .endgame-popup-container {
     width: 290px;
   }
 

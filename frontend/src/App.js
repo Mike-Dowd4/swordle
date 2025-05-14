@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import { useState, useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import JSConfetti from "js-confetti";
@@ -88,13 +87,12 @@ function App() {
     }
   }
 
-  // Checks if user has won/lost to display correct losing/winning display(on page return)
-  // This fires once game has loaded(because correctSwimmer is set)
-  // User can either be midgame, not started game, or done with game
-  // If midgame - must display current board
-  // If endgame - must display current board/endgame screen
+  // This is triggered when a user refreshes/comes back to page
   useEffect(() => {
     let guesses = JSON.parse(localStorage.getItem("guessList"));
+    if(!guesses) {
+      return
+    }
     if (!guesses[0] || !correctSwimmer) { //If not loaded yet or user has not started playing yet skip
       return;
     }
@@ -107,14 +105,13 @@ function App() {
     }
 
     //Decide if the user is done with game
-    if(correctSwimmer._id === lastGuess._id) {
-      setGameWin(true);
+    if(correctSwimmer._id === lastGuess._id) { //If user has already won
       displayCurrentBoard();
-      doneForDay();
+      handleWin();
     }
-    else {
-      setLoss(true);
+    else { //If user has already loss
       displayCurrentBoard();
+      handleLoss();
     }
 
   }, [correctSwimmer])
@@ -123,6 +120,29 @@ function App() {
   //Function that's called when the user has used up all of their guesses
   function doneForDay() {
     setDisabled(true);
+  }
+
+  function handleWin() {
+    doneForDay();
+    setGameWin(true);
+    const jsConfetti = new JSConfetti();
+    jsConfetti.addConfetti();
+
+    setTimeout(showEndGame, 1000);
+  }
+
+  function handleLoss() {
+    doneForDay();
+    setLoss(true);
+
+    setTimeout(() => {
+      //styling for endgame then show
+      const comp = document.getElementById("endgame-feedback");
+      comp.style.width = '80%';
+      
+      showEndGame();
+    }, 3000);
+    
   }
 
   //For testing
@@ -168,7 +188,7 @@ function App() {
     e.preventDefault();
     console.log(correctSwimmer);
 
-    if (checkLocalStorage() == true) {
+    if (checkLocalStorage() === true) {
       return;
     } 
 
@@ -176,7 +196,7 @@ function App() {
     const swimmer = swimmerData.find(swimmer => swimmer.Name.toLowerCase() === swimmerGuess.toLowerCase());
 
     //Lets user know if their guess is valid
-    if(swimmer == undefined) {
+    if(swimmer === undefined) {
 
       //TODO: add function to deal with this on frontend
       // alert("This swimmer is not a possible answer");
@@ -201,12 +221,7 @@ function App() {
       setGuessList([swimmer, ...guessList]);
       setGuessFeedback([guessFeedback, ...guessFeedbackList]);
       
-      setGameWin(true);
-      setDisabled(true);
-
-      //confetti for the dub
-      const jsConfetti = new JSConfetti();
-      jsConfetti.addConfetti();
+      handleWin();
     }
     else {//incorrect guess
       localStorage.setItem("guessList", JSON.stringify([swimmer, ...guessList]));
@@ -217,8 +232,7 @@ function App() {
       
       //LOSS CONDITION
       if(numGuesses >= 5) { //Game over if not win yet and guesses over 5
-        doneForDay();
-        setLoss(true);
+        handleLoss();
       }
     }
 
@@ -253,7 +267,7 @@ function App() {
     let container = document.getElementById("guess-list-container");
     let currentHead = container.firstElementChild;
     console.log(container.childNodes.length);
-    if (container.childNodes.length == 0) {
+    if (container.childNodes.length === 0) {
       newDiv.classList.add("guess-list-new");
       container.appendChild(newDiv);
 
@@ -468,7 +482,7 @@ function App() {
             </div>
             
 
-            <GuessFeedbackComponent guess={correctSwimmer} ind={-1}/>
+            <GuessFeedbackComponent id="endgame-feedback" guess={correctSwimmer} ind={-1}/>
           </div>
         )}
 
@@ -490,20 +504,22 @@ function App() {
     const guess = props.guess
     let ind = props.ind
 
+    const id = props.id || "";
+
     let guessFeedbackList_ = JSON.parse(localStorage.getItem("guessFeedback"));
 
     console.log("hey", guessFeedbackList_);
     //Handles when user loses
-    if (ind == -1) {
+    if (ind === -1) {
       const guessFeedback = getGuessFeedback(correctSwimmer, correctSwimmer)
       guessFeedbackList_.push(guessFeedback)
       ind = 5
     }
     return(
-      <div className="guess-list">
+      <div className="guess-list" id={id}>
       
       <div className="guess-name">
-        <img src="/swimmer_images/aaron_shackell.png" alt="swimmer image"></img>
+        <img src="/swimmer_images/aaron_shackell.png" alt="aaron shackell"></img>
         {/* print out guess number and guess name */}
         <span className="guess-name-text">{guess.Name}</span>
       </div>
@@ -627,12 +643,28 @@ function showInstructions() {
   document.getElementById("overlay").classList.add("active");
 }
 
-// Close instructions
+// Close instructions (and endgame component if it's endgame)
 function closeInstructions() {
-  document.getElementById("instructions-popup-container").style.display="none"
+  document.getElementById("instructions-popup-container").style.display="none";
+  document.getElementById("endgame-popup-container").style.display="none";
+  document.getElementById("endgame-popup-container").style.opacity=0;
   document.body.classList.remove('no-scroll');
   document.getElementById("overlay").classList.remove("active");
 }
+
+//Shows after user wins/loses
+function showEndGame() {
+  document.getElementById("endgame-popup-container").style.display="block";
+  
+  setTimeout(() => {
+    document.getElementById("endgame-popup-container").style.opacity="100%";
+
+  }, 5);
+
+  document.body.classList.add('no-scroll'); // disable scrolling
+  document.getElementById("overlay").classList.add("active");
+}
+
 
 
 if(loading) {
@@ -699,7 +731,7 @@ if(loading) {
             <div className="dropdown-items" id="dropdown-items" ref={dropdownRef}>
               {swimmerData.map((swimmer) => (
                 <div className="dropdown-item" onMouseDown={() => {fillInput(swimmer.Name)}}>
-                  <img className="swimmer-img" src="/swimmer_images/aaron_shackell.png"/>
+                  <img className="swimmer-img" src="/swimmer_images/aaron_shackell.png" alt="aaron shackell"/>
                   <span className="swimmer-name" key={swimmer._id}>{swimmer.Name}</span>
                 </div>
               ))}
@@ -709,18 +741,9 @@ if(loading) {
           </div>
         </div>
 
-        <EndGameComponent/>
+        {/* <EndGameComponent/> */}
 
         <div className="guess-list-container" id="guess-list-container">
-{/*           
-            {guessList.map((guess, ind) => (
-              <>
-              <GuessFeedbackComponent guess={guess} ind={ind} />
-              </>
-              
-            ))} */}
-              
-          
         </div>
 
         <div className="restart-container">
@@ -748,6 +771,17 @@ if(loading) {
           irrelevant now, so keep that in mind. 
         </p>
         <p className = "shoutout-text">Special shoutout to Tim Cheng for making the data used for Swordle</p>
+      </div>
+
+
+      <div className="endgame-popup-container" id="endgame-popup-container">
+        <div className="instructions-close-button" onClick={closeInstructions}>
+          <span className='closeout'>&times;</span>
+        </div>
+
+
+        <EndGameComponent/>
+        <button>TRY AGAIN</button>
       </div>
     </>
   );
