@@ -679,7 +679,7 @@ if(loading) {
     <>
       <div className="overlay" id="overlay" onClick={closeInstructions}></div>
       <div className="header">
-        <div className="open-endgame">
+        <div className="open-endgame" onClick={showEndGame}>
           <i class="fa-solid fa-arrow-rotate-right"></i>
         </div>
         <h1>SWORDLE</h1>
