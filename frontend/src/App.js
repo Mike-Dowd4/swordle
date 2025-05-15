@@ -56,7 +56,7 @@ function App() {
         //store the guessList and guessFeedback in localstorage
         localStorage.setItem("guessList", "[]");
         localStorage.setItem("guessFeedback", "[]");
-        localStorage.setItem("idx_of_answer", (Math.floor(Math.random()*(res_data.swimmers.length-1))).toString());
+        setAnswer(res_data.swimmers.length);
 
         let idx_of_answer = parseInt(localStorage.getItem("idx_of_answer"));
         setCorrectSwimmer(res_data.swimmers[idx_of_answer]);
@@ -81,15 +81,6 @@ function App() {
     getSwimmers();
 
   }, []); 
-
-  //Clears guesses from board for UI cleanup
-  function clearGuesses() {
-    // Removes all guesses from board
-    const guesses = document.getElementById('guess-list-container');
-    while (guesses.firstChild) {
-        guesses.removeChild(guesses.firstChild);
-    }
-  }
 
   // This is triggered when a user refreshes/comes back to page
   useEffect(() => {
@@ -120,10 +111,41 @@ function App() {
 
   }, [correctSwimmer])
 
-  function timeTilTomorrow() {
+  //set index of answer
+  function setAnswer(numSwimmers) {
+    const today = new Date().toDateString();
+    const idx = getIntegerFromDate(today, 0, numSwimmers-1);
 
+    localStorage.setItem("idx_of_answer", idx.toString());
   }
 
+
+  //From chatgpt, gets deterministic index from date string within range
+  function getIntegerFromDate(dateInput, min, max) {
+  const date = new Date(dateInput);
+  const seedString = date.toDateString(); // e.g., "Mon May 13 2025"
+  
+  // Create a basic hash from the date string
+  let hash = 0;
+  for (let i = 0; i < seedString.length; i++) {
+    hash = (hash << 5) - hash + seedString.charCodeAt(i);
+    hash |= 0; // Convert to 32bit integer
+  }
+
+  // Normalize to a value between min and max
+  const range = max - min + 1;
+  const value = Math.abs(hash) % range;
+  return min + value;
+}
+
+  //Clears guesses from board for UI cleanup
+  function clearGuesses() {
+    // Removes all guesses from board
+    const guesses = document.getElementById('guess-list-container');
+    while (guesses.firstChild) {
+        guesses.removeChild(guesses.firstChild);
+    }
+  }
 
   //Function that's called when the user has used up all of their guesses
   function doneForDay() {
@@ -181,8 +203,9 @@ function App() {
    
     clearGuesses();
     closeInstructions();
+
+    setAnswer(numSwimmers);
     
-    localStorage.setItem("idx_of_answer", (Math.floor(Math.random()*(numSwimmers-1))).toString());
     let idx_of_answer = parseInt(localStorage.getItem("idx_of_answer"));
     setCorrectSwimmer(swimmerData[idx_of_answer]);
   }
