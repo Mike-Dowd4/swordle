@@ -37,6 +37,7 @@ body::-webkit-scrollbar {
   left: 20px;
   cursor: pointer;
   font-size: 24px;
+  display: none;
 }
 
 
@@ -262,7 +263,7 @@ font-size: 10px;
 
 .game-loss {
   /* text-align: center; */
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .game-loss-description {
@@ -301,6 +302,12 @@ font-size: 10px;
   display: none;
   transition: all 2s;
   opacity: 0;
+}
+
+/* Try again button in endgame */
+.try-again{
+  display: block;
+  margin: 0 auto;
 }
 
 .instructions-close-button {
@@ -383,10 +390,6 @@ font-size: 10px;
 /* Show the overlay when active */
 .overlay.active {
   display: block;
-}
-
-.restart-container {
-  text-align: center;
 }
 
 @media (prefers-reduced-motion: no-preference) {

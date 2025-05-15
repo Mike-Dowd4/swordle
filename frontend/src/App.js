@@ -37,17 +37,21 @@ function App() {
       //Sort swimmer data by swimmer name
       let v = res_data.swimmers;
       v = v.sort((a,b) => a.Name.localeCompare(b.Name))
-
-      setSwimmerData(v);
       
+      setSwimmerData(v);
 
+      //Check if user last played today, if not, then restart game
+      const dateLastPlayed = localStorage.getItem("lastPlayed");
+      const today = new Date().toDateString();
+      
       //Check if user has played yet today, if not, set numGuesses
       if(localStorage.getItem("numGuesses") == null || 
         localStorage.getItem("guessList") == null || 
         localStorage.getItem("guessFeedback") == null || 
-        localStorage.getItem("idx_of_answer") == null){
+        localStorage.getItem("idx_of_answer") == null ||
+        dateLastPlayed !== today){
 
-
+        localStorage.setItem("lastPlayed", today);
         localStorage.setItem("numGuesses", "1");
         //store the guessList and guessFeedback in localstorage
         localStorage.setItem("guessList", "[]");
@@ -116,6 +120,10 @@ function App() {
 
   }, [correctSwimmer])
 
+  function timeTilTomorrow() {
+
+  }
+
 
   //Function that's called when the user has used up all of their guesses
   function doneForDay() {
@@ -128,7 +136,14 @@ function App() {
     const jsConfetti = new JSConfetti();
     jsConfetti.addConfetti();
 
-    setTimeout(showEndGame, 1000);
+    setTimeout(() => {
+      const reopen = document.getElementById("endgame");
+      reopen.style.display="block";
+
+      showEndGame();
+    }, 2000);
+
+    //restart game once it is the next day
   }
 
   function handleLoss() {
@@ -139,9 +154,13 @@ function App() {
       //styling for endgame then show
       const comp = document.getElementById("endgame-feedback");
       comp.style.width = '80%';
+
+      //show reopen button
+      const reopen = document.getElementById("endgame");
+      reopen.style.display="block";
       
       showEndGame();
-    }, 3000);
+    }, 2000);
     
   }
 
@@ -156,10 +175,14 @@ function App() {
     setGameWin(false);
     setLoss(false);
 
+    let numSwimmers = swimmerData.length;
+
+    //Clean up UI
+   
     clearGuesses();
-
-
-    localStorage.setItem("idx_of_answer", (Math.floor(Math.random()*(swimmerData.length-1))).toString());
+    closeInstructions();
+    
+    localStorage.setItem("idx_of_answer", (Math.floor(Math.random()*(numSwimmers-1))).toString());
     let idx_of_answer = parseInt(localStorage.getItem("idx_of_answer"));
     setCorrectSwimmer(swimmerData[idx_of_answer]);
   }
@@ -190,7 +213,10 @@ function App() {
 
     if (checkLocalStorage() === true) {
       return;
-    } 
+    }
+    
+    //Mark the last time user played
+    localStorage.setItem("lastPlayed", new Date().toDateString());
 
     //The info of the swimmer that was guessed
     const swimmer = swimmerData.find(swimmer => swimmer.Name.toLowerCase() === swimmerGuess.toLowerCase());
@@ -491,7 +517,7 @@ function App() {
         { /* Only show this if gameWin hook is true */ }
         {gameWin && (
           <div className='game-win'>
-          <span>Game Over. You win!</span>
+          <h1>Game Over. You win!</h1>
         </div>)}
 
     </div>
@@ -656,10 +682,11 @@ function closeInstructions() {
 function showEndGame() {
   document.getElementById("endgame-popup-container").style.display="block";
   
+  //Timeout here so that the animation fires
   setTimeout(() => {
     document.getElementById("endgame-popup-container").style.opacity="100%";
 
-  }, 5);
+  }, 10);
 
   document.body.classList.add('no-scroll'); // disable scrolling
   document.getElementById("overlay").classList.add("active");
@@ -679,9 +706,13 @@ if(loading) {
     <>
       <div className="overlay" id="overlay" onClick={closeInstructions}></div>
       <div className="header">
-        <div className="open-endgame" onClick={showEndGame}>
+        {(gameWin || gameLoss) && (
+          <div className="open-endgame" id="endgame" onClick={showEndGame}>
           <i class="fa-solid fa-arrow-rotate-right"></i>
-        </div>
+          </div>
+        )
+        }
+        
         <h1>SWORDLE</h1>
         <div className="instructions-icon" onClick={showInstructions}>
           <i className="fa fa-question-circle"></i>
@@ -749,10 +780,6 @@ if(loading) {
         <div className="guess-list-container" id="guess-list-container">
         </div>
 
-        <div className="restart-container">
-          <button onClick={restart_game} >restart</button>
-        </div>
-
       </div>
 
       <div className="instructions-popup-container" id="instructions-popup-container">
@@ -784,7 +811,14 @@ if(loading) {
 
 
         <EndGameComponent/>
-        <button>TRY AGAIN</button>
+
+        <div className='game-loss-description'>
+          <span>Come back tomorrow for a new game!</span>
+        </div>
+        {/* This will be only gameLoss when done */}
+        {(gameLoss||gameWin) && (
+          <button className="try-again" onClick={restart_game}>TRY AGAIN</button>
+        )}
       </div>
     </>
   );
