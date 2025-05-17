@@ -238,19 +238,32 @@ function App() {
     //The info of the swimmer that was guessed
     const swimmer = swimmerData.find(swimmer => swimmer.Name.toLowerCase() === swimmerGuess.toLowerCase());
 
+    //Check if user guessed this swimmer yet
+    let guesses = JSON.parse(localStorage.getItem("guessList"));
+    let found = false;
+    //Is this real swimmer
+    const notSwimmer = swimmer === undefined;
+
+    if(!notSwimmer) { //Check if user guessed this swimmer yet only if it's valid swimmer
+      found = guesses.some(guess => guess._id === swimmer._id);
+    }
+
     //Lets user know if their guess is valid
-    if(swimmer === undefined) {
-
-      //TODO: add function to deal with this on frontend
-      // alert("This swimmer is not a possible answer");
-
+    if(notSwimmer || found) {
       document.getElementById("invalid-guess-text").style.visibility = "visible";
+      if(found && !notSwimmer) {
+        document.getElementById("invalid-guess-text").textContent = "This swimmer was guessed already";
+      } else {
+        document.getElementById("invalid-guess-text").textContent = "Invalid Guess";
+      }
       return;
     }
-    else {
+    else { //If swimmer is valid, hide the invalid guess text and hide dropdown items
       document.getElementById("invalid-guess-text").style.visibility = "hidden";
+      document.getElementById("invalid-guess-text").textContent = "";
       document.getElementById("dropdown-items").style.visibility = "hidden";
     }
+
 
 
     const numGuesses = parseInt(localStorage.getItem("numGuesses"));
@@ -299,7 +312,7 @@ function App() {
 
 
     //Update UI
-    let guesses = JSON.parse(localStorage.getItem("guessList"));
+    guesses = JSON.parse(localStorage.getItem("guessList"));
 
     let newGuess = guesses[0];
 
@@ -788,7 +801,7 @@ if(loading) {
                      disabled={guessDisabled}
                      onClick={submitGuess}></input> 
               <br/>
-              <span className="invalid-guess-text" id="invalid-guess-text">The swimmer you entered is invalid</span>
+              <span className="invalid-guess-text" id="invalid-guess-text"></span>
             </div>
 
             {/* Search Dropdown */}
