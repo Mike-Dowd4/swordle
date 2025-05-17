@@ -232,7 +232,6 @@ function App() {
 
   function submitGuess(e) {
     e.preventDefault();
-    console.log(correctSwimmer);
 
     if (checkLocalStorage() === true) {
       return;
@@ -255,6 +254,7 @@ function App() {
     }
     else {
       document.getElementById("invalid-guess-text").style.visibility = "hidden";
+      document.getElementById("dropdown-items").style.visibility = "hidden";
     }
 
 
@@ -307,7 +307,6 @@ function App() {
     let guesses = JSON.parse(localStorage.getItem("guessList"));
 
     let newGuess = guesses[0];
-    console.log(newGuess);
 
     const newDiv = document.createElement("div");
     const root = createRoot(newDiv);
@@ -315,7 +314,6 @@ function App() {
     root.render(<GuessFeedbackComponent guess={newGuess} ind={0}/>);
     let container = document.getElementById("guess-list-container");
     let currentHead = container.firstElementChild;
-    console.log(container.childNodes.length);
     if (container.childNodes.length === 0) {
       newDiv.classList.add("guess-list-new");
       container.appendChild(newDiv);
@@ -351,11 +349,9 @@ function App() {
   function displayCurrentBoard() {
     //Clear board in case there are stragglers
     clearGuesses();
-    console.log("displayCurrentBoard");
 
     let listParent = document.getElementById("guess-list-container");
     for(let i=0; i <guessList.length; i++) {
-      console.log("hi,", i);
       const newGuess = guessList[i];
       const newDiv = document.createElement("div");
       const root = createRoot(newDiv);
@@ -470,14 +466,25 @@ function App() {
     const guessAge = getAge(guess.Birthday);
     age=guessAge;
     const correctAge = getAge(correct.Birthday);
+    const diff = Math.abs(correctAge-guessAge);
     if (guessAge === correctAge) {
       ageColor = "green";
     }
-    else if (guessAge < correctAge) {
-      ageColor = "yellow^";
+    else if(diff <= 2) {
+      if (guessAge < correctAge) {
+        ageColor = "yellow^"; 
+      }
+      else {
+        ageColor = "yellow_";
+      }
     }
     else {
-      ageColor="yellow_";
+      if (guessAge < correctAge) {
+        ageColor = "gray^"; 
+      }
+      else {
+        ageColor = "gray_";
+      }
     }
 
     //set stroke correctness
@@ -557,7 +564,6 @@ function App() {
 
     let guessFeedbackList_ = JSON.parse(localStorage.getItem("guessFeedback"));
 
-    console.log("hey", guessFeedbackList_);
     //Handles when user loses
     if (ind === -1) {
       const guessFeedback = getGuessFeedback(correctSwimmer, correctSwimmer)
@@ -595,10 +601,10 @@ function App() {
 
           {/* Add up and down arrow symbol, using unicode values */}
           <span className='hintCategory'>Age</span>
-          <span className="hint-answer-text">
+          <span className="hint-answer-text" id="age-hint">
           {guessFeedbackList_[ind].age}
-          {guessFeedbackList_[ind].ageColor === 'yellow^' ? ' \u2191':
-          guessFeedbackList_[ind].ageColor === 'yellow_' ? ' \u2193' : ''}
+          {guessFeedbackList_[ind].ageColor === 'yellow^' || guessFeedbackList_[ind].ageColor === 'gray^' ? <span style={{paddingLeft: '5px'}}><i className="fa-solid fa-arrow-up"></i></span>:
+          guessFeedbackList_[ind].ageColor === 'yellow_'  || guessFeedbackList_[ind].ageColor === 'gray_'? <span style={{paddingLeft: '5px'}}><i className="fa-solid fa-arrow-down"></i></span> : ''}
           </span>
 
         </div>
@@ -660,6 +666,8 @@ function App() {
   function searchNames(e) {
     let search = e.target.value.toLowerCase();
     let dropdown = document.getElementById("dropdown-items");
+
+    if (search.length >=1 ) dropdown.style.visibility = "visible";
 
     let swimmers = dropdown.getElementsByClassName("dropdown-item");
 
@@ -731,7 +739,7 @@ if(loading) {
       <div className="header">
         {(gameWin || gameLoss) && (
           <div className="open-endgame" id="endgame" onClick={showEndGame}>
-          <i class="fa-solid fa-arrow-rotate-right"></i>
+          <i className="fa-solid fa-arrow-rotate-right"></i>
           </div>
         )
         }
@@ -767,6 +775,10 @@ if(loading) {
                     name="swimmer" 
                     onChange={(e) => setSwimmerGuess(e.target.value)} 
                     onKeyUp={searchNames}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter")
+                        document.getElementById("guess-button").click();
+                      }}
                     disabled={guessDisabled}
                     onFocus={() => {dropdownRef.current.style.visibility='visible'}}
                     onBlur={() => {dropdownRef.current.style.visibility='hidden'}}
@@ -775,12 +787,12 @@ if(loading) {
                       paddingLeft:'5%'
                     }}
               />
-              <input className="guess-button" 
+              <input className="guess-button" id="guess-button"
                      type="submit" 
                      value="Guess" 
                      disabled={guessDisabled}
                      onClick={submitGuess}></input> 
-
+              <br/>
               <span className="invalid-guess-text" id="invalid-guess-text">The swimmer you entered is invalid</span>
             </div>
 
@@ -816,6 +828,7 @@ if(loading) {
           <li>If Stroke is <span style={{color: 'rgb(179, 161, 50)'}}>yellow</span>, one but not all of the strokes are correct</li>
           <li>If Nationality is <span style={{color: 'rgb(179, 161, 50)'}}>yellow</span>, the Country is on the correct Continent</li>
           <li>If College is <span style={{color: 'rgb(179, 161, 50)'}}>yellow</span>, the College is in the correct Conference</li>
+          <li>If Age is <span style={{color: 'rgb(179, 161, 50)'}}>yellow</span>, the Age is within 2 years of the correct Age</li>
           <li>College is the last college the swimmer swam at</li>
         </ul>
 
@@ -838,10 +851,10 @@ if(loading) {
         <div className='game-loss-description'>
           <span>Come back tomorrow for a new game!</span>
         </div>
-        {/* This will be only gameLoss when done */}
+        {/* This will be only gameLoss when done
         {(gameLoss||gameWin) && (
           <button className="try-again" onClick={restart_game}>TRY AGAIN</button>
-        )}
+        )} */}
       </div>
     </>
   );

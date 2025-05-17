@@ -135,14 +135,18 @@ background: #555;
   position: relative;
   margin: 0 auto;
   text-align: center;
+  white-space: nowrap;
+  padding-bottom: 10px;
 }
 
 .guess-input {
+  margin-top: 5px;
   width: 70%;
-  height: 25px;
+  height: 30px;
   border-radius: 25px;
   background-color: rgb(81, 169, 172);
   border: none;
+  font-size: 16px;
 }
 
 /* Guess submit button */
@@ -150,7 +154,8 @@ background: #555;
   margin-left: 5px;
   border-radius: 10px;
   border: none;
-  height: 25px;
+  height: 30px;
+  font-size: 15px;
   cursor: pointer;
   transition: all 0.5s;
 }
@@ -250,7 +255,7 @@ font-size: 10px;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 5px;
+  gap: 3px;
   margin: 2px;
   padding: 5px;
   padding-inline: 25px;
@@ -258,6 +263,12 @@ font-size: 10px;
   border-radius: 20px;
 }
 
+#age-hint {
+  white-space: nowrap;
+}
+.fa-solid.fa-arrow-up.lit {
+  margin-left: 5px;
+}
 
 .game-win {
   text-align: center;
@@ -279,7 +290,7 @@ font-size: 10px;
 .instructions-popup-container {
   position: fixed;
   width: 400px;
-  height: 450px;
+  height: 470px;
   background-color: rgb(227, 233, 232);
   top: 50%;
   left: 50%;
@@ -352,6 +363,7 @@ font-size: 10px;
 @media (max-width: 400px) {
   .instructions-popup-container {
     width: 290px;
+    height: 435px;
   }
 
   .endgame-popup-container {

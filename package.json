@@ -1,0 +1,15 @@
+{
+  "name": "swordle",
+  "version": "1.0.0",
+  "description": "swordle",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "concurrently \"npm start --prefix frontend\" \"npm start --prefix backend \"",
+    "prod": "concurrently \"(cd frontend && serve -s build)\" \"npm start --prefix backend \""
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
