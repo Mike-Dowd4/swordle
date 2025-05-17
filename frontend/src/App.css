@@ -93,6 +93,7 @@ background: #555;
   border-radius: 10px;
   top: 80%;
   opacity: 80%;
+  z-index: 100;
 }
 
 
@@ -122,10 +123,13 @@ background: #555;
     padding-right: 5%
 }
 
+
 #input-and-guess-btn {
-  width: 20%;
-  min-width: 250px;
-  margin-bottom: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 
@@ -140,7 +144,6 @@ background: #555;
 }
 
 .guess-input {
-  margin-top: 5px;
   width: 70%;
   height: 30px;
   border-radius: 25px;
@@ -153,7 +156,7 @@ background: #555;
 .guess-button { 
   margin-left: 5px;
   border-radius: 10px;
-  border: none;
+  /* border: none; */
   height: 30px;
   font-size: 15px;
   cursor: pointer;
@@ -168,6 +171,7 @@ background: #555;
 /* guess a swimmer label */
 .label {
   display: block;
+  margin-bottom: 15px;
 }
 
 
@@ -191,8 +195,9 @@ background: #555;
 
 .invalid-guess-text {
   color:red;
-  font-size: 10px;
+  font-size: 11px;
   visibility: hidden;
+  margin-bottom: 5px;
   
 }
 
@@ -290,7 +295,7 @@ font-size: 10px;
 .instructions-popup-container {
   position: fixed;
   width: 400px;
-  height: 470px;
+  height: fit-content;
   background-color: rgb(227, 233, 232);
   top: 50%;
   left: 50%;
@@ -299,12 +304,14 @@ font-size: 10px;
   /* z-index makes it above overlay */
   z-index: 1000; 
   display: none;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5), 0 15px 40px rgba(0, 0, 0, 0.10);
+
 }
 
 .endgame-popup-container {
   position: fixed;
   width: 400px;
-  height: 450px;
+  height: fit-content;
   background-color: rgba(4, 4, 128);
   top: 50%;
   left: 50%;
@@ -315,6 +322,14 @@ font-size: 10px;
   display: none;
   transition: all 2s;
   opacity: 0;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5), 0 15px 40px rgba(0, 0, 0, 0.10);
+
+}
+
+.come-back {
+  display: block;
+  margin-top: 60%;
+  margin-bottom: 10px;
 }
 
 /* Try again button in endgame */
@@ -351,24 +366,24 @@ font-size: 10px;
 .note-text {
   color: black;
   padding: 0 5%;
+  margin-bottom: 40px;
 }
 
 .shoutout-text {
+  position: relative;
   color: black;
-  padding-top: 12%;
   font-size: 12px;
   text-align: center;
+  bottom: 0px;
 }
 
 @media (max-width: 400px) {
   .instructions-popup-container {
     width: 290px;
-    height: 435px;
   }
 
   .endgame-popup-container {
     width: 290px;
-    height: 500px;
   }
 
   .instructions-list {
@@ -381,7 +396,6 @@ font-size: 10px;
 
   .shoutout-text {
     font-size: 10px;
-    padding-top: 14%;
   }
 
 }

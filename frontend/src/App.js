@@ -28,7 +28,7 @@ function App() {
   // ensures user is not over number of allowed guesses
   useEffect(() => {
     async function getSwimmers() {
-      const response = await fetch("http://localhost:8080/api/swordle", {
+      const response = await fetch("http://swordle.org:8080/api/swordle", {
         method: "GET"
       })
 
@@ -763,17 +763,16 @@ if(loading) {
 
           <div className="guess-form">
             <span className="label">Guess a swimmer: </span>
-            
-            <br></br>
 
-            <div id="input-and-guess-btn">
-              {/* numGuess is at 6(after game ends) keep display at 5 */}
+            {/* numGuess is at 6(after game ends) keep display at 5 */}
               { 
               parseInt(localStorage.getItem("numGuesses")) >= 5 ? 
               <span className="guess-counter">Guess #5 of 5</span> :
               <span className="guess-counter"> Guess #{parseInt(localStorage.getItem("numGuesses"))} of 5</span>
               }   
-              <br></br>
+            
+            <div id="input-and-guess-btn">
+              
               <input 
                     className="guess-input"
                     autoComplete='off'
@@ -801,8 +800,9 @@ if(loading) {
                      disabled={guessDisabled}
                      onClick={submitGuess}></input> 
               <br/>
-              <span className="invalid-guess-text" id="invalid-guess-text"></span>
             </div>
+
+            <span className="invalid-guess-text" id="invalid-guess-text"></span>
 
             {/* Search Dropdown */}
             <div className="dropdown-items" id="dropdown-items" ref={dropdownRef}>
@@ -857,7 +857,7 @@ if(loading) {
         <EndGameComponent/>
 
         <div className='game-loss-description'>
-          <span>Come back tomorrow for a new game!</span>
+          <span className="come-back">Come back tomorrow for a new game!</span>
         </div>
         {/* This will be only gameLoss when done
         {(gameLoss||gameWin) && (
