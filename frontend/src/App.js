@@ -43,12 +43,12 @@ function App() {
       //Check if user last played today, if not, then restart game
       const dateLastPlayed = localStorage.getItem("lastPlayed");
       const today = new Date().toDateString();
+      const idx_of_answer = getAnswer(res_data.swimmers.length);
       
       //Check if user has played yet today, if not, set numGuesses
       if(localStorage.getItem("numGuesses") == null || 
         localStorage.getItem("guessList") == null || 
         localStorage.getItem("guessFeedback") == null || 
-        localStorage.getItem("idx_of_answer") == null ||
         dateLastPlayed !== today){
 
         localStorage.setItem("lastPlayed", today);
@@ -56,9 +56,7 @@ function App() {
         //store the guessList and guessFeedback in localstorage
         localStorage.setItem("guessList", "[]");
         localStorage.setItem("guessFeedback", "[]");
-        setAnswer(res_data.swimmers.length);
-
-        let idx_of_answer = parseInt(localStorage.getItem("idx_of_answer"));
+        
         setCorrectSwimmer(res_data.swimmers[idx_of_answer]);
       }else { //user is in middle of game
        
@@ -66,7 +64,6 @@ function App() {
         setGuessList(JSON.parse(localStorage.getItem("guessList")));
         setGuessFeedback(JSON.parse(localStorage.getItem("guessFeedback")));
 
-        let idx_of_answer = parseInt(localStorage.getItem("idx_of_answer"));
         setCorrectSwimmer(res_data.swimmers[idx_of_answer]);
       }
 
@@ -112,11 +109,11 @@ function App() {
   }, [correctSwimmer])
 
   //set index of answer
-  function setAnswer(numSwimmers) {
+  function getAnswer(numSwimmers) {
     const today = new Date().toDateString();
     const idx = getIntegerFromDate(today, 0, numSwimmers-1);
 
-    localStorage.setItem("idx_of_answer", idx.toString());
+    return idx;
   }
 
 
@@ -204,9 +201,8 @@ function App() {
     clearGuesses();
     closeInstructions();
 
-    setAnswer(numSwimmers);
+    const idx_of_answer = getAnswer(numSwimmers);
     
-    let idx_of_answer = parseInt(localStorage.getItem("idx_of_answer"));
     setCorrectSwimmer(swimmerData[idx_of_answer]);
   }
 
@@ -216,8 +212,7 @@ function App() {
 
     if(localStorage.getItem("numGuesses") == null || 
         localStorage.getItem("guessList") == null || 
-        localStorage.getItem("guessFeedback") == null || 
-        localStorage.getItem("idx_of_answer") == null){
+        localStorage.getItem("guessFeedback") == null){
 
       
       //Clears the input box after a guess
