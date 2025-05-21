@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require("cors");
 
 const swordleRoutes = require('./routes/api/swordle');
-const connectDB = require('./configs/db');
+const db = require('./configs/db'); //To load mysql connection
 
 const app = express();
 
@@ -24,7 +24,6 @@ app.use(cors());
 
 app.use("/api/swordle", swordleRoutes);
 
-connectDB();
 
 port = 8080
 

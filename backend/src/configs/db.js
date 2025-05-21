@@ -1,23 +1,21 @@
-const mongoose = require("mongoose");
 const path = require('path')
+const mysql = require('mysql');
 
 
+const connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'MRD*goCaps4',
+    database: 'swimmers'
+});
 
-require("dotenv").config({path: path.resolve(__dirname, '../../../.env')});
-
-const db = process.env.MONGO_URL;
-
-mongoose.set("strictQuery", true, "useNewUrlParser", true);
-
-const connectDB = async () => {
-  try {
-    await mongoose.connect(db, {
-      dbName: "swimmer_data"
-    });
-    console.log("MongoDB is Connected...");
-  } catch (err) {
-    console.error(err.message);
-    process.exit(1);
+connection.connect((err) => {
+  if (err) {
+    console.error("Error connecting to MySQL");
   }
-};
-module.exports = connectDB;
+
+  console.log("Connected to mySQL");
+});
+
+  
+module.exports = connection;

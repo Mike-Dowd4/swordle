@@ -1,19 +1,19 @@
 const express = require('express');
 
-const Swimmer = require('../models/Swimmer.js');
+const connection = require('../configs/db');
+
+
 
 
 // Gets all of the swimmers in DB(for search bar)
 module.exports.getSwimmers = async (req, res) => {
-    try {
-        const swimmers = await Swimmer.find();
-        return res.json({status: true,
-            swimmers: swimmers
-        });
-    }
-    catch(e) {
-        console.log('failed: ', e);
-        return null;
-    }
+
+    connection.query('SELECT * FROM swimmers', (err, rows, fields) => {
+    if (err) return res.status(500).json({ status: false, error: err });
+
+    return res.json({status: true,
+        swimmers: rows
+    });
+    });
     
 }

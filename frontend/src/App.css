@@ -152,6 +152,11 @@ background: #555;
   font-size: 16px;
 }
 
+.guess-input::placeholder {
+  color: black;
+  opacity: 80%;
+}
+
 /* Guess submit button */
 .guess-button { 
   margin-left: 5px;

@@ -28,7 +28,7 @@ function App() {
   // ensures user is not over number of allowed guesses
   useEffect(() => {
     async function getSwimmers() {
-      const response = await fetch("http://swordle.org:8080/api/swordle", {
+      const response = await fetch("http://localhost:8080/api/swordle", {
         method: "GET"
       })
 
@@ -91,13 +91,13 @@ function App() {
 
     let lastGuess = guesses[0];
 
-    if (guesses.length > 0 && guessList.length < 5 && correctSwimmer._id !== lastGuess._id) { //User refreshes/comes back during game
+    if (guesses.length > 0 && guessList.length < 5 && correctSwimmer.id !== lastGuess.id) { //User refreshes/comes back during game
       displayCurrentBoard();
       return;
     }
 
     //Decide if the user is done with game
-    if(correctSwimmer._id === lastGuess._id) { //If user has already won
+    if(correctSwimmer.id === lastGuess.id) { //If user has already won
       displayCurrentBoard();
       handleWin();
     }
@@ -245,7 +245,7 @@ function App() {
     const notSwimmer = swimmer === undefined;
 
     if(!notSwimmer) { //Check if user guessed this swimmer yet only if it's valid swimmer
-      found = guesses.some(guess => guess._id === swimmer._id);
+      found = guesses.some(guess => guess.id === swimmer.id);
     }
 
     //Lets user know if their guess is valid
@@ -271,7 +271,7 @@ function App() {
     const guessFeedback = getGuessFeedback(swimmer, correctSwimmer);
     
     // Handle Guess
-    if(swimmer._id === correctSwimmer._id) { //correct guess
+    if(swimmer.id === correctSwimmer.id) { //correct guess
       localStorage.setItem("guessList", JSON.stringify([swimmer, ...guessList ]));
       localStorage.setItem("guessFeedback", JSON.stringify([guessFeedback, ...guessFeedbackList]));
 
@@ -433,8 +433,8 @@ function App() {
     if(guess["Continent 1"] === correct["Continent 1"] ||
       guess["Continent 2"] === correct["Continent 1"] ||
       (guess["Continent 2"] === correct["Continent 2"] &&
-        guess["Continent 2"] != null &&
-        correct["Continent 2"] != null)
+        guess["Continent 2"] !== 'N/A' &&
+        correct["Continent 2"] !== 'N/A')
     ) {
       return "yellow";
     }
@@ -500,7 +500,7 @@ function App() {
 
     //set specialty correctness(sprint, distance, stroke, etc) 
     //getStrokeCorrectness also works for specialty
-    specialty = getStrokeCorrectness(guess.Speciality, correct.Speciality)
+    specialty = getStrokeCorrectness(guess.speciality, correct.speciality)
 
     gender = getStrokeCorrectness(guess.Gender, correct.Gender);
 
@@ -636,7 +636,7 @@ function App() {
           width: '100px'}}>
 
           <span className='hintCategory'>Specialty</span>
-          <span className="hint-answer-text">{guess.Speciality}</span>
+          <span className="hint-answer-text">{guess.speciality}</span>
         </div>
 
         <div style = {{backgroundColor: 
@@ -659,7 +659,7 @@ function App() {
           <span className='hintCategory'>College</span>
           
           <span className="hint-answer-text">
-          {guess["US College / University"] === null ? 'N/A' : 
+          {guess["US College / University"] === 'N/A' ? 'N/A' : 
           guess["US College / University"]}
           </span>
           
@@ -780,6 +780,7 @@ if(loading) {
                     ref={inputRef} // Assign ref to input
                     list="swimmers" 
                     name="swimmer" 
+                    placeholder="Enter Swimmer"
                     onChange={(e) => setSwimmerGuess(e.target.value)} 
                     onKeyUp={searchNames}
                     onKeyDown={(e) => {
@@ -809,7 +810,7 @@ if(loading) {
               {swimmerData.map((swimmer) => (
                 <div className="dropdown-item" onMouseDown={() => {fillInput(swimmer.Name)}}>
                   <img className="swimmer-img" src="/swimmer_images/aaron_shackell.png" alt="aaron shackell"/>
-                  <span className="swimmer-name" key={swimmer._id}>{swimmer.Name}</span>
+                  <span className="swimmer-name" key={swimmer.id}>{swimmer.Name}</span>
                 </div>
               ))}
             </div>
