@@ -572,6 +572,11 @@ function App() {
 
     let guessFeedbackList_ = JSON.parse(localStorage.getItem("guessFeedback"));
 
+    const x = guess.Name.replaceAll(" ", "_")
+    const img_src = "/swimmer_images/" + x + ".webp"
+
+
+
     //Handles when user loses
     if (ind === -1) {
       const guessFeedback = getGuessFeedback(correctSwimmer, correctSwimmer)
@@ -582,7 +587,12 @@ function App() {
       <div className="guess-list" id={id}>
       
       <div className="guess-name">
-        <img src="/swimmer_images/aaron_shackell.png" alt="aaron shackell"></img>
+        <img src={img_src}
+          onError={(e) => {
+            e.target.onerror = null; // Prevent infinite loop if fallback also fails
+            e.target.src = "/swimmer_images/placeholder.png";
+          }}
+         alt={guess.Name}></img>
         {/* print out guess number and guess name */}
         <span className="guess-name-text">{guess.Name}</span>
       </div>
@@ -800,7 +810,6 @@ if(loading) {
                      value="Guess" 
                      disabled={guessDisabled}
                      onClick={submitGuess}></input> 
-              <br/>
             </div>
 
             <span className="invalid-guess-text" id="invalid-guess-text"></span>
@@ -809,7 +818,13 @@ if(loading) {
             <div className="dropdown-items" id="dropdown-items" ref={dropdownRef}>
               {swimmerData.map((swimmer) => (
                 <div className="dropdown-item" onMouseDown={() => {fillInput(swimmer.Name)}}>
-                  <img className="swimmer-img" src="/swimmer_images/aaron_shackell.png" alt="aaron shackell"/>
+                  <img className="swimmer-img"
+                   src={"/swimmer_images/" + swimmer.Name.replaceAll(" ", "_") + ".webp"} 
+                   onError={(e) => {
+                      e.target.onerror = null; // Prevent infinite loop if fallback also fails
+                      e.target.src = "/swimmer_images/placeholder.png";
+                    }}
+                   alt={swimmer.Name}/>
                   <span className="swimmer-name" key={swimmer.id}>{swimmer.Name}</span>
                 </div>
               ))}
